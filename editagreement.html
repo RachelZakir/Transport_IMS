@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agreement Detail</title>
+  <style>
+    body {
+      background-image: url('log.jpg');
+      background-size: cover; 
+      background-repeat: no-repeat;
+      background-color: #f0f0f0; 
+      width: 100%;
+      height: 100vh; /* 100% of the viewport height */
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #ffffff;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      margin: 0;
+    }
+
+    .buttons-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .button:last-child {
+      margin-right: 0;
+    }
+
+    .dashboard-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      backdrop-filter: blur(5px); /* Apply blur effect */
+      display: flex; /* Use flexbox */
+    }
+
+    .column {
+      flex: 1; /* Equal width for both columns */
+      padding: 0 30px; /* Add padding between columns */
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: bold;
+    }
+
+    .field input[type="text"],
+    .field select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .field.loading-unloading-date {
+      text-align: left;
+    }
+     .row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .field {
+      flex-basis: calc(50% - 10px); /* Adjust the width of each column */
+      margin-bottom: 15px;
+    }
+
+    .field:not(:last-child) {
+      margin-right: 10px;
+    }
+  </style>
+  <script src="session.js"></script>
+   <iframe src="chatbot.html" width="400" height="500" style="position: fixed; bottom: 0; right: 0; border: none;"></iframe>
+</head>
+<body>
+  <div class="header">
+    <h1>Please Insert Agreement Detail</h1>
+    <div class="buttons-container">
+    </div>
+  </div>
+
+  <div class="dashboard-container">
+    <form id="agreementForm" onsubmit="updateAgreement(); return false;">
+      <!-- Input field for agreement ID -->
+      <input type="hidden" id="agreementId" name="agreementId" value="">
+      
+      <!-- Form fields -->
+      <div class="row">
+        <div class="field">
+          <label for="shipperName">Shipper:</label>
+          <select id="shipperName" required>
+            <!-- Dropdown options will be populated dynamically -->
+          </select>
+        </div>
+      </div>
+       <div class="field">
+          <label for="consigneename">Consignee Name:</label>
+          <input type="text" id="consigneename">
+        </div>
+        <div class="field">
+          <label for="consigneeadress">Consignee Address:</label>
+          <input type="text" id="consigneeadress">
+        </div>
+      <div class="field">
+        <label for="agreementTitle">Agreement Title:</label>
+        <input type="text" id="agreementTitle" required>
+      </div>
+      <div class="field">
+        <label for="pickupAddress">Pickup Address:</label>
+        <input type="text" id="pickupAddress" required>
+      </div>
+      <div class="field">
+        <label for="dropAddress">Drop Address:</label>
+        <input type="text" id="dropAddress" required>
+      </div>
+      <div class="field">
+        <label for="cargoType">Cargo Type:</label>
+        <input type="text" id="cargoType" required>
+      </div>
+      <div class="field">
+        <label for="kmCovered">Km Covered:</label>
+        <input type="text" id="kmCovered" onchange="calculateRevenue()" required>
+      </div>
+      <div class="field">
+        <label for="totalQuintal">Total Quintal:</label>
+        <input type="text" id="totalQuintal" onchange="calculateRevenue()" required>
+      </div>
+      <div class="field">
+        <label for="tariffPerQuintal">Tariff per Quintal:</label>
+        <input type="text" id="tariffPerQuintal" onchange="calculateRevenue()">
+      </div>
+      <div class="field">
+        <label for="expectedRevenue">Expected Revenue:</label>
+        <input type="text" id="expectedRevenue" readonly>
+      </div>
+
+      <button type="submit" class="button">Update</button>
+    </form>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+<script>
+  // Initialize Firebase
+  var firebaseConfig = {
+    apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+    authDomain: "el-roi-48b9f.firebaseapp.com",
+    databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "el-roi-48b9f",
+    storageBucket: "el-roi-48b9f.appspot.com",
+    messagingSenderId: "402630086025",
+    appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+  };
+  firebase.initializeApp(firebaseConfig);
+  var database = firebase.database();
+
+  // Populate shipper dropdown and load agreement details
+  window.onload = function() {
+    const params = new URLSearchParams(window.location.search);
+    const agreementId = params.get('agreementId');
+    document.getElementById("agreementId").value = agreementId;
+
+    // Populate shipper dropdown and then load agreement details
+    populateShipperDropdown().then(() => {
+      loadAgreementDetails(agreementId);
+    });
+  };
+
+  function populateShipperDropdown() {
+    return new Promise((resolve, reject) => {
+      const shipperDropdown = document.getElementById("shipperName");
+      const shippersRef = database.ref('shippers');
+      shippersRef.once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          const shipperName = childSnapshot.val().shipperName;
+          const option = document.createElement("option");
+          option.text = shipperName;
+          shipperDropdown.add(option);
+        });
+        resolve();
+      }).catch(error => {
+        console.error("Error populating shippers dropdown:", error);
+        reject(error);
+      });
+    });
+  }
+
+  function loadAgreementDetails(agreementId) {
+  const agreementRef = database.ref('agreements').child(agreementId);
+  agreementRef.once('value', function(snapshot) {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      // Populate form fields with agreement details
+      document.getElementById("shipperName").value = data.shipper;
+      document.getElementById("consigneename").value = data.consigneename;
+      document.getElementById("consigneeadress").value = data.consigneeadress;
+      document.getElementById("agreementTitle").value = data.agreementTitle;
+      document.getElementById("pickupAddress").value = data.pickupAddress;
+      document.getElementById("dropAddress").value = data.dropAddress;
+      document.getElementById("cargoType").value = data.cargoType;
+      document.getElementById("kmCovered").value = data.kmCovered;
+      document.getElementById("totalQuintal").value = data.totalQuintal;
+      document.getElementById("tariffPerQuintal").value = data.tariffPerQuintal;
+      document.getElementById("expectedRevenue").value = data.expectedRevenue;
+    } else {
+      console.error("No agreement found with ID:", agreementId);
+    }
+  }, function(error) {
+    console.error("Error fetching agreement details:", error);
+  });
+}
+
+  function updateAgreement() {
+    const agreementId = document.getElementById("agreementId").value;
+    const agreementRef = database.ref('agreements').orderByChild('agreementId').equalTo(agreementId);
+
+    agreementRef.once('value', function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+        const key = childSnapshot.key;
+
+        database.ref('agreements/' + key).update({
+          shipper: document.getElementById("shipperName").value,
+          consigneename: document.getElementById("consigneename").value,
+          consigneeadress: document.getElementById("consigneeadress").value,
+          agreementTitle: document.getElementById("agreementTitle").value,
+          pickupAddress: document.getElementById("pickupAddress").value,
+          dropAddress: document.getElementById("dropAddress").value,
+          cargoType: document.getElementById("cargoType").value,
+          kmCovered: document.getElementById("kmCovered").value,
+          totalQuintal: document.getElementById("totalQuintal").value,
+          tariffPerQuintal: document.getElementById("tariffPerQuintal").value,
+          expectedRevenue: document.getElementById("expectedRevenue").value
+        }).then(() => {
+          alert("Agreement updated successfully!");
+          window.location.href = 'Agreement.html';
+        }).catch((error) => {
+          console.error("Error updating agreement: ", error);
+          alert("An error occurred while updating the agreement. Please try again.");
+        });
+      });
+    });
+  }
+
+  function calculateRevenue() {
+    const totalQuintal = parseFloat(document.getElementById("totalQuintal").value);
+    const tariffPerQuintal = parseFloat(document.getElementById("tariffPerQuintal").value);
+    const expectedRevenue = totalQuintal * tariffPerQuintal;
+    document.getElementById("expectedRevenue").value = isNaN(expectedRevenue) ? "" : expectedRevenue;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Vehicles</title>
+  <style>
+    body {
+      background-image: url('log.jpg');
+      background-size: cover; 
+      background-repeat: no-repeat;
+      background-color: #f0f0f0; 
+      width: 100%;
+      height: 100vh; /* 100% of the viewport height */
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #ffffff;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      margin: 0;
+    }
+
+    .buttons-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 10px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .button:last-child {
+      margin-right: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: white;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .edit-delete-buttons button {
+      background-color: #f44336;
+      color: white;
+      padding: 1px 1px;
+      border: none;
+      border-radius: 1px;
+      cursor: pointer;
+      margin-right: 1px;
+    }
+
+    .edit-delete-buttons button.edit {
+      background-color: #4CAF50;
+    }
+  </style>
+  <script src="session.js"></script> 
+</head>
+<body>
+  <div class="header">
+    <h1>Search Vehicles</h1>
+    <div class="buttons-container">
+      <!-- Add button for searching vehicles -->
+      <button class="button" onclick="searchVehicles()">Search</button>
+    </div>
+  </div>
+
+  <div class="dashboard-container">
+    <!-- Form to enter the plate number for searching -->
+    <form id="searchForm">
+      <div class="field">
+        <label for="search_plate">Search by Plate Number:</label>
+        <input type="text" id="search_plate" name="search_plate" required>
+      </div>
+    </form>
+
+    <!-- Container to display search results -->
+    <div id="searchResults"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+  <script>
+    // Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+      authDomain: "el-roi-48b9f.firebaseapp.com",
+      databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "el-roi-48b9f",
+      storageBucket: "el-roi-48b9f.appspot.com",
+      messagingSenderId: "402630086025",
+      appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Reference to the Firebase database
+    var database = firebase.database();
+
+    // Function to search vehicles by plate number
+    function searchVehicles() {
+      var searchPlate = document.getElementById('search_plate').value.trim();
+
+      // Query vehicles by plate number
+      database.ref('vehicles').orderByChild('plateNumber').equalTo(searchPlate).once('value', function(snapshot) {
+        var resultsContainer = document.getElementById('searchResults');
+        resultsContainer.innerHTML = ''; // Clear previous search results
+
+        var vehicleData = snapshot.val();
+
+        if (vehicleData) {
+          // Define the order of attributes in the table
+          var attributeOrder = ['plateNumber', 'vehicleType', 'chassisNumber', 'modelNumber', 'motorNumber', 'yearOfMaking', 'capacity'];
+
+          // Create table for displaying search results
+          var table = document.createElement('table');
+
+          // Create header row
+          var headerRow = table.insertRow();
+          attributeOrder.forEach(function(attribute) {
+            var th = document.createElement('th');
+            th.textContent = attribute.replace(/_/g, ' ');
+            headerRow.appendChild(th);
+          });
+          // Add header for actions
+          var thActions = document.createElement('th');
+          thActions.textContent = 'Actions';
+          headerRow.appendChild(thActions);
+
+          // Create data rows
+          for (var key in vehicleData) {
+            if (vehicleData.hasOwnProperty(key)) {
+              var rowData = vehicleData[key];
+              var dataRow = table.insertRow();
+              attributeOrder.forEach(function(attribute) {
+                var td = document.createElement('td');
+                td.textContent = rowData[attribute];
+                dataRow.appendChild(td);
+              });
+
+              // Add delete button
+              var deleteButton = document.createElement('button');
+              deleteButton.textContent = 'Delete';
+              deleteButton.onclick = function() {
+                deleteVehicle(key);
+              };
+              dataRow.insertCell().appendChild(deleteButton);
+
+              // Add edit button
+              var editButton = document.createElement('button');
+              editButton.textContent = 'Edit';
+              editButton.onclick = function() {
+                editVehicle(key, rowData);
+              };
+              dataRow.insertCell().appendChild(editButton);
+            }
+          }
+
+          resultsContainer.appendChild(table);
+        } else {
+          // Display message if no matching vehicle found
+          var message = document.createElement('p');
+          message.textContent = 'No matching vehicle found.';
+          resultsContainer.appendChild(message);
+        }
+      });
+    }
+
+    // Function to delete a vehicle
+    function deleteVehicle(vehicleKey) {
+      var confirmation = confirm('Are you sure you want to delete this vehicle?');
+      if (confirmation) {
+        database.ref('vehicles/' + vehicleKey).remove()
+          .then(function() {
+            alert('Vehicle deleted successfully!');
+            searchVehicles(); // Refresh search results after deletion
+          })
+          .catch(function(error) {
+            console.error('Error deleting vehicle:', error);
+            alert('Error deleting vehicle. Please try again.');
+          });
+      }
+    }
+
+    // Function to edit a vehicle
+    function editVehicle(vehicleKey, vehicleData) {
+      // Implement the edit functionality here, for example:
+      // You can open a modal with a form pre-filled with the vehicle's data
+      console.log('Editing vehicle with key:', vehicleKey);
+      console.log('Vehicle data:', vehicleData);
+    }
+  </script>
+</body>
+</html>

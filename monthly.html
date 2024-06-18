@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trip Financial Summary</title>
+  <style>
+   body {
+  background-image: url('log.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: #f0f0f0;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  background-color: #ffffff;
+  padding: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h3 {
+  margin: 0;
+}
+
+.buttons-container {
+  display: flex;
+  align-items: center;
+}
+
+.button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.button-delete {
+  background-color: lightcoral; /* Light red color */
+  color: white;
+}
+
+.button-edit {
+  background-color: lightblue; /* Light blue color */
+  color: white;
+}
+
+.button:last-child {
+  margin-right: 0;
+}
+
+.dashboard-container {
+  width: 100%;
+  max-width: 1300px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #ffffff;
+}
+
+th, td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  font-size: 12px; /* Smaller font size for table data */
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pagination button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  margin: 0 5px;
+}
+
+.pagination button:hover {
+  background-color: #45a049;
+}
+
+.container {
+  max-width: 1500px;
+  margin: 0px auto 10px; /* Adjust margin to push container down */
+  padding: 3px;
+  background-color: rgba(255, 255, 255, 0.9); /* Add opacity to container background */
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  position: relative; /* Ensure container is positioned relative */
+  z-index: 2; /* Ensure container is above background image */
+}
+
+h3 {
+  text-align: left;
+}
+
+.dashboard-section {
+  margin-bottom: 10px;
+}
+
+.dashboard-section h2 {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
+.report-container {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.logo {
+  position: absolute;
+  top: 10px; /* Adjust as needed */
+  right: 10px; /* Adjust as needed */
+  width: 120px; /* Smaller width */
+  height: auto; /* Maintain aspect ratio */
+  z-index: 2; /* Ensure logo is above container */
+}
+
+.bottom-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.user-info-container {
+  position: absolute;
+  top: 20px; /* Adjust top position */
+  right: 10px; /* Adjust right position */
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+  margin-right: 10px; /* Add space between avatar and name */
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 3;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.4);
+  padding-top: 60px;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 50px;
+  border: 1px solid #888;
+  width: 100%;
+  max-width: 300px;
+  border-radius: 5px;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+  </style>
+  <script src="session.js"></script>
+   <iframe src="chatbot.html" width="400" height="500" style="position: fixed; bottom: 0; right: 0; border: none;"></iframe>
+</head>
+<body>
+  <div class="user-info-container">
+    <div class="user-info">
+      <img src="profile.jpg" class="user-avatar" onclick="toggleDropdown()" alt="User">
+      <div class="dropdown-content" id="dropdownContent">
+        <a href="#" onclick="showChangePasswordModal()">Change Password</a>
+        <a href="#">User Settings</a>
+      </div>
+      <span class="user-name" id="userName"></span>
+    </div>
+  </div>
+  <div class="container">
+    <div class="user-info">
+      <h2 id="userFullName"></h2> <!-- Replace "User Name" with actual user name -->
+    </div>
+    <img src="logo.jpg" alt="Logo of My Website" class="logo">
+    <h2>Kerchanshe Transport And logistics</h2>
+    <!-- Buttons Section -->
+    <div class="dashboard-section">
+       <a class="button" href="dashboard.html">Dashboard</a>
+      <a class="button" href="trip.html">Trip</a> <!-- Add href attribute pointing to trip.html -->
+      <div class="dropdown">
+        <button class="button">Financial Summary</button>
+        <div class="dropdown-content">
+    <a href="monthly.html"><h5>Trip Financial Summary</h5></a>
+    <a href="DriversreportFilter.html"><h5>Drivers Financial Summary</h5></a>
+    <a href="shippersreport.html"><h5>Shippers Financial Summary</h5></a>
+    <a href="vehiclesreport.html"><h5>Vehicles Financial Summary</h5></a>
+</div>
+      </div>
+      <div class="dropdown">
+        <button class="button">Resources</button>
+        <div class="dropdown-content">
+          <a href="Vehicles.html">Vehicles</a>
+          <a href="Drivers.html">Drivers</a>
+          <a href="Shiper.html">Shipper</a> <!-- Add href attribute pointing to Drivers.html -->
+          <a href="Agreement.html">Agreement</a>
+          <a href="assist.html">Assist Drivers</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="button">Payment requisition</button>
+        <div class="dropdown-content">
+    <a href="Payment_requisition.html"><h5>Rayment requisition</h5></a>
+    <a href="monthly.html"><h5>Payment requisition Summary</h5></a>
+    <a href="DriversreportFilter.html"><h5>Drivers payment requisition Summary</h5></a>
+    <a href="shippersreport.html"><h5>Ass.Driver payment requisition Summary</h5></a>
+       </div>
+     </div>
+      <a class="button" href="#">Help</a>
+    </div>
+  </div>
+  <!-- Bottom Container -->
+  <!-- Password Change Modal -->
+  <div id="passwordChangeModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeChangePasswordModal()">&times;</span>
+      <h2>Change Password</h2>
+      <form id="passwordChangeForm" onsubmit="return changePassword()">
+        <label for="oldPassword">Old Password:</label>
+        <input type="password" id="oldPassword" required>
+        <label for="newPassword">New Password:</label>
+                <input type="password" id="newPassword" required>
+        <label for="confirmNewPassword">Confirm New Password:</label>
+        <input type="password" id="confirmNewPassword" required>
+        <button type="submit" class="button">Change Password</button>
+      </form>
+    </div>
+  </div>
+  <div class="header">
+    <h2>El-Roi Transport and Logistics Trip Financial Summary</h2>
+  </div>
+
+  <div class="dashboard-container" id="tripTableContainer">
+    <!-- Table to display trip data will be inserted here -->
+  </div>
+
+  <div class="pagination" id="paginationContainer">
+    <!-- Pagination buttons will be inserted here -->
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+  <script>
+    // Initialize Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+      authDomain: "el-roi-48b9f.firebaseapp.com",
+      databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "el-roi-48b9f",
+      storageBucket: "el-roi-48b9f.appspot.com",
+      messagingSenderId: "402630086025",
+      appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    var database = firebase.database();
+    var currentPage = 1; // Global variable to track current page
+    var grandTotalQuintal = 0;
+    var grandTotalKmCovered = 0;
+    var grandTotalExpectedRevenue = 0;
+    var grandTotalCost = 0;
+    var grandTotalBalance = 0;
+
+    // Function to format date (showing only date without time)
+    function formatDate(dateString) {
+      var date = new Date(dateString);
+      var formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' });
+      return formattedDate;
+    }
+
+    // Function to fetch and display trips from the database
+    function displayTrips(page) {
+      var tripTableContainer = document.getElementById("tripTableContainer");
+      var paginationContainer = document.getElementById("paginationContainer");
+      var tripsRef = database.ref('trips');
+
+      tripsRef.once('value', function(snapshot) {
+        var trips = snapshot.val();
+        if (trips) {
+          var tableHTML = "<table>";
+          tableHTML += "<tr><th>Trip ID</th><th>Driver Name</th><th>Plate Number</th><th>Shipper</th><th>Pickup Address</th><th>Drop Address</th><th>Loading Date</th><th>Unloading Date</th><th>Cargo Type</th><th>Total Quintal</th><th>Km Covered</th><th>Expected Revenue</th><th>Total Cost</th><th>Balance</th><th>Status</th><th colspan='2'>Action</th></tr>";
+
+          var tripsArray = Object.values(trips);
+          var totalPages = Math.ceil(tripsArray.length / 10);
+          var startIndex = (page - 1) * 10;
+          var endIndex = Math.min(startIndex + 10, tripsArray.length);
+          var paginatedTrips = tripsArray.slice(startIndex, endIndex);
+
+          var pageTotalQuintal = 0;
+          var pageTotalKmCovered = 0;
+          var pageTotalExpectedRevenue = 0;
+          var pageTotalCost = 0;
+          var pageTotalBalance = 0;
+
+          tripsArray.forEach(function(trip) {
+            if (trip.status.toLowerCase() === "completed") {
+              grandTotalQuintal += parseFloat(trip.totalQuintal) || 0;
+              grandTotalKmCovered += parseFloat(trip.kmCovered) || 0;
+              grandTotalExpectedRevenue += parseFloat(trip.expectedRevenue) || 0;
+              grandTotalCost += parseFloat(trip.totalCost) || 0;
+              grandTotalBalance += parseFloat(trip.balance) || 0;
+            }
+          });
+
+          paginatedTrips.forEach(function(trip) {
+            if (trip.status.toLowerCase() === "completed") {
+              pageTotalQuintal += parseFloat(trip.totalQuintal) || 0;
+              pageTotalKmCovered += parseFloat(trip.kmCovered) || 0;
+              pageTotalExpectedRevenue += parseFloat(trip.expectedRevenue) || 0;
+              pageTotalCost += parseFloat(trip.totalCost) || 0;
+              pageTotalBalance += parseFloat(trip.balance) || 0;
+
+              tableHTML += "<tr>";
+              tableHTML += "<td>" + trip.tripID + "</td>";
+              tableHTML += "<td>" + trip.driverName + "</td>";
+              tableHTML += "<td>" + trip.plateNumber + "</td>";
+              tableHTML += "<td>" + trip.shipperName + "</td>";
+              tableHTML += "<td>" + trip.pickupAddress + "</td>";
+              tableHTML += "<td>" + trip.dropAddress + "</td>";
+              tableHTML += "<td>" + formatDate(trip.loadingDate) + "</td>";
+              tableHTML += "<td>" + formatDate(trip.unloadingDate) + "</td>";
+              tableHTML += "<td>" + trip.cargoType + "</td>";
+              tableHTML += "<td>" + trip.totalQuintal + "</td>";
+              tableHTML += "<td>" + trip.kmCovered + "</td>";
+              tableHTML += "<td>" + trip.expectedRevenue + "</td>";
+              tableHTML += "<td>" + trip.totalCost + "</td>";
+              tableHTML += "<td>" + trip.balance + "</td>";
+              tableHTML += "<td>" + trip.status + "</td>";
+              tableHTML += "<td><button class='button button-note' onclick=\"addNote('" + trip.tripID + "')\">Note</button></td>";
+              tableHTML += "</tr>";
+            }
+          });
+
+          // Add the page total row
+          tableHTML += "<tr style='font-weight: bold;'>";
+          tableHTML += "<td colspan='9' style='text-align: right;'>Page Total</td>";
+          tableHTML += "<td>" + pageTotalQuintal.toFixed(2) + "</td>";
+          tableHTML += "<td>" + pageTotalKmCovered.toFixed(2) + "</td>";
+          tableHTML += "<td>" + pageTotalExpectedRevenue.toFixed(2) + "</td>";
+          tableHTML += "<td>" + pageTotalCost.toFixed(2) + "</td>";
+          tableHTML += "<td>" + pageTotalBalance.toFixed(2) + "</td>";
+          tableHTML += "<td colspan='2'></td>"; // Empty columns for the action buttons
+          tableHTML += "</tr>";
+
+          // Add the grand total row only on the last page
+          if (page === totalPages) {
+            tableHTML += "<tr style='font-weight: bold;'>";
+            tableHTML += "<td colspan='9' style='text-align: right;'>Grand Total</td>";
+            tableHTML += "<td>" + grandTotalQuintal.toFixed(2) + "</td>";
+            tableHTML += "<td>" + grandTotalKmCovered.toFixed(2) + "</td>";
+            tableHTML += "<td>" + grandTotalExpectedRevenue.toFixed(2) + "</td>";
+            tableHTML += "<td>" + grandTotalCost.toFixed(2) + "</td>";
+            tableHTML += "<td>" + grandTotalBalance.toFixed(2) + "</td>";
+            tableHTML += "<td colspan='2'></td>"; // Empty columns for the action buttons
+            tableHTML += "</tr>";
+          }
+
+          tableHTML += "</table>";
+          tripTableContainer.innerHTML = tableHTML;
+
+          var paginationHTML = '';
+          for (var i = 1; i <= totalPages; i++) {
+            paginationHTML += '<button onclick="changePage(' + i + ')">' + i + '</button>';
+          }
+          paginationContainer.innerHTML = paginationHTML;
+        } else {
+          tripTableContainer.innerHTML = "<p>No trips found.</p>";
+        }
+      });
+    }
+
+    // Function to change the current page
+    function changePage(pageNumber) {
+      currentPage = pageNumber;
+      displayTrips(currentPage);
+    }
+
+    // Call the function to display trips when the page loads
+    window.onload = function() {
+      displayTrips(currentPage);
+    };
+  </script>
+</body>
+</html>

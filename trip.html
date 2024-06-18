@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trip</title>
+  <style>
+    body {
+      background-image: url('log.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-color: #f0f0f0;
+      width: 100%;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .header {
+      background-color: #ffffff;
+      padding: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      margin: 0;
+    }
+
+    .buttons-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .button-edit {
+      background-color: yellow; /* Light red color */
+      color: black;
+    }
+    .button-complete {
+      background-color: lightblue; /* Light blue color */
+      color: black;
+    }
+    .button-delete {
+      background-color: lightcoral; /* Light red color */
+      color: black;
+    }
+
+    .button:last-child {
+      margin-right: 0;
+    }
+
+    .dashboard-container {
+      width: 100%;
+      max-width: 1300px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #ffffff;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+      font-size: 12px; /* Smaller font size for table data */
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .pagination {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .pagination button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      margin: 0 5px;
+    }
+
+    .pagination button:hover {
+      background-color: #45a049;
+    }
+
+    .container {
+      max-width: 1500px;
+      margin: 0px auto 10px; /* Adjust margin to push container down */
+      padding: 3px;
+      background-color: rgba(255, 255, 255, 0.9); /* Add opacity to container background */
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: relative; /* Ensure container is positioned relative */
+      z-index: 2; /* Ensure container is above background image */
+    }
+
+    h3 {
+      text-align: left;
+    }
+
+    .dashboard-section {
+      margin-bottom: 10px;
+    }
+
+    .dashboard-section h2 {
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+
+    .report-container {
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    .logo {
+      position: absolute;
+      top: 10px; /* Adjust as needed */
+      right: 10px; /* Adjust as needed */
+      width: 120px; /* Smaller width */
+      height: auto; /* Maintain aspect ratio */
+      z-index: 2; /* Ensure logo is above container */
+    }
+
+    .bottom-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .user-info-container {
+      position: absolute;
+      top: 20px; /* Adjust top position */
+      right: 10px; /* Adjust right position */
+      display: flex;
+      align-items: center;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+      margin-right: 10px; /* Add space between avatar and name */
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 3;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0,0.4);
+      padding-top: 60px;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 50px;
+      border: 1px solid #888;
+      width: 100%;
+      max-width: 300px;
+      border-radius: 5px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    #toggleChat {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 16px;
+      cursor: pointer;
+      outline: none;
+      z-index: 1000; /* Ensure the toggle button is on top */
+    }
+
+    #toggleChat:hover {
+      background-color: #0056b3;
+    }
+
+    #dialogflowChatWrapper {
+      display: none;
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 400px; /* Match this width to the width of the iframe in the parent */
+      height: 500px; /* Match this height to the height of the iframe in the parent */
+      z-index: 1000; /* Ensure the wrapper is on top */
+    }
+
+    #dialogflowChat {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+  </style>
+  <script src="session.js"></script>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+   <!-- Toggle button for Dialogflow chat interface -->
+  <button id="toggleChat">Need Help?</button>
+
+  <!-- Dialogflow iframe wrapped in a div -->
+  <div id="dialogflowChatWrapper">
+    <iframe
+      id="dialogflowChat"
+      allow="microphone;"
+      src="https://console.dialogflow.com/api-client/demo/embedded/6b1176b0-16c8-4ffb-9e37-495f47d7ee58">
+    </iframe>
+  </div>
+  <div class="user-info-container">
+    <div class="user-info">
+      <img src="profile.jpg" class="user-avatar" onclick="toggleDropdown()" alt="User">
+      <div class="dropdown-content" id="dropdownContent">
+        <a href="#" onclick="showChangePasswordModal()">Change Password</a>
+        <a href="#">User Settings</a>
+      </div>
+      <span class="user-name" id="userName"></span>
+    </div>
+  </div>
+  <div class="container">
+    <div class="user-info">
+      <h2 id="userFullName"></h2> <!-- Replace "User Name" with actual user name -->
+    </div>
+    <img src="logo.jpg" alt="Logo of My Website" class="logo">
+    <h2>Kerchanshe Transport And logistics</h2>
+    <!-- Buttons Section -->
+    <div class="dashboard-section">
+      <a class="button" href="dashboard.html">Dashboard</a>
+      <a class="button" href="trip.html">Trip</a> <!-- Add href attribute pointing to trip.html -->
+      <div class="dropdown">
+        <button class="button">Financial Summary</button>
+        <div class="dropdown-content">
+          <a href="monthly.html"><h5>Trip Financial Summary</h5></a>
+          <a href="DriversreportFilter.html"><h5>Drivers Financial Summary</h5></a>
+          <a href="shippersreport.html"><h5>Shippers Financial Summary</h5></a>
+          <a href="vehiclesreport.html"><h5>Vehicles Financial Summary</h5></a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="button">Resources</button>
+        <div class="dropdown-content">
+          <a href="Vehicles.html">Vehicles</a>
+          <a href="Drivers.html">Drivers</a>
+          <a href="Shiper.html">Shipper</a> <!-- Add href attribute pointing to Drivers.html -->
+          <a href="Agreement.html">Agreement</a>
+           <a href="assist.html">Assist Drivers</a>
+        </div>
+      </div>
+
+       <div class="dropdown">
+        <button class="button">Payment requisition</button>
+        <div class="dropdown-content">
+    <a href="Payment_requisition.html"><h5>Rayment requisition</h5></a>
+    <a href="monthly.html"><h5>Payment requisition Summary</h5></a>
+    <a href="DriversreportFilter.html"><h5>Drivers payment requisition Summary</h5></a>
+    <a href="shippersreport.html"><h5>Ass.Driver payment requisition Summary</h5></a>
+       </div>
+     </div>
+      <a class="button" href="#">Help</a>
+    </div>
+  </div>
+  <!-- Bottom Container -->
+  <!-- Password Change Modal -->
+  <div id="passwordChangeModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeChangePasswordModal()">&times;</span>
+      <h2>Change Password</h2>
+      <form id="passwordChangeForm" onsubmit="return changePassword()">
+        <label for="oldPassword">Old Password:</label>
+        <input type="password" id="oldPassword" required>
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword" required>
+        <label for="confirmNewPassword">Confirm New Password:</label>
+        <input type="password" id="confirmNewPassword" required>
+        <button type="submit" class="button">Change Password</button>
+      </form>
+    </div>
+  </div>
+  <div class="header">
+    <h1>Trip</h1>
+    <div class="buttons-container">
+      <a href="newtrip.html" class="button button-new-trip" id="newTripButton">New Trip</a>
+    </div>
+  </div>
+
+  <div class="dashboard-container" id="tripTableContainer">
+    <!-- Table to display trip data will be inserted here -->
+  </div>
+
+  <div class="pagination" id="paginationContainer">
+    <!-- Pagination buttons will be inserted here -->
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+  <script>
+    // Initialize Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+      authDomain: "el-roi-48b9f.firebaseapp.com",
+      databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "el-roi-48b9f",
+      storageBucket: "el-roi-48b9f.appspot.com",
+      messagingSenderId: "402630086025",
+      appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    var database = firebase.database();
+    var currentPage = 1; // Global variable to track current page
+
+    // Function to format date (showing only date without time)
+    function formatDate(dateString) {
+      var date = new Date(dateString);
+      var formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' });
+      return formattedDate;
+    }
+
+    // Function to fetch and display trips from the database
+   function displayTrips(page) {
+  var tripTableContainer = document.getElementById("tripTableContainer");
+  var paginationContainer = document.getElementById("paginationContainer");
+  var tripsRef = database.ref('trips');
+
+  tripsRef.once('value', function(snapshot) {
+    var trips = snapshot.val();
+    console.log("Trips snapshot:", trips); // Log trips data to console for debugging
+
+    if (trips) {
+      var tableHTML = "<table>";
+      tableHTML += "<tr><th>Freight Order</th><th>Driver Name</th><th>Plate Number</th><th>Pickup Address</th><th>Drop Address</th><th>Loading Date</th><th>Unloading Date</th><th>Cargo Type</th><th>Total Quintal</th><th>Km Covered</th><th>Tariff per Quintal</th><th>Expected Revenue</th><th>Status</th><th colspan='4'>Action</th></tr>";
+
+      var tripsArray = Object.values(trips);
+      var totalPages = Math.ceil(tripsArray.length / 10);
+      var startIndex = (page - 1) * 10;
+      var endIndex = Math.min(startIndex + 10, tripsArray.length);
+      var paginatedTrips = tripsArray.slice(startIndex, endIndex);
+
+      paginatedTrips.forEach(function(trip) {
+        tableHTML += "<tr>";
+        tableHTML += "<td>" + trip.tripID + "</td>";
+        tableHTML += "<td>" + trip.driverName + "</td>";
+        tableHTML += "<td>" + trip.plateNumber + "</td>";
+        tableHTML += "<td>" + trip.pickupAddress + "</td>";
+        tableHTML += "<td>" + trip.dropAddress + "</td>";
+        tableHTML += "<td>" + formatDate(trip.loadingDate) + "</td>";
+        tableHTML += "<td>" + formatDate(trip.unloadingDate) + "</td>";
+        tableHTML += "<td>" + trip.cargoType + "</td>";
+        tableHTML += "<td>" + trip.totalQuintal + "</td>";
+        tableHTML += "<td>" + trip.kmCovered + "</td>";
+        tableHTML += "<td>" + trip.tariffPerQuintal + "</td>";
+        tableHTML += "<td>" + trip.expectedRevenue + "</td>";
+        tableHTML += "<td>" + trip.status + "</td>";
+
+        tableHTML += "<td><button class='button button-note' title='Add Note' onclick=\"addNote('" + trip.tripID + "')\"><i class='fas fa-sticky-note'></i></button></td>";
+
+        if (trip.status === "on transit") {
+          tableHTML += "<td>" +
+            "<button class='button button-complete' title='Complete Trip' onclick=\"completeTrip('" + trip.tripID + "')\"><i class='fas fa-check'></i></button>" +
+            "<button class='button button-edit' title='Edit Trip' onclick=\"editTrip('" + trip.tripID + "')\"><i class='fas fa-edit'></i></button>" +
+            "<button class='button button-delete' title='Delete Trip' onclick=\"confirmDelete('" + trip.tripID + "')\"><i class='fas fa-trash'></i></button>" +
+            "<button class='button button-advance' title='Advance Payment' onclick=\"advancepayment('" + trip.tripID + "')\"><i class='fas fa-money-bill-alt'></i></button>" +
+            "</td>";
+        } else {
+          tableHTML += "<td></td>";
+        }
+        tableHTML += "<td><button class='button button-print' title='Print Freight Order' onclick=\"printFO('" + trip.tripID + "')\"><i class='fas fa-print'></i></button></td>";
+        tableHTML += "</tr>";
+      });
+
+      tableHTML += "</table>";
+      tripTableContainer.innerHTML = tableHTML;
+
+      var paginationHTML = '';
+      for (var i = 1; i <= totalPages; i++) {
+        paginationHTML += '<button onclick="changePage(' + i + ')">' + i + '</button>';
+      }
+      paginationContainer.innerHTML = paginationHTML;
+    } else {
+      tripTableContainer.innerHTML = "<p>No trips found.</p>";
+    }
+  });
+}
+
+
+    // Function to change the current page
+    function changePage(pageNumber) {
+      currentPage = pageNumber;
+      displayTrips(currentPage);
+    }
+
+    // Function to delete a trip
+    function deleteTrip(tripId) {
+      var tripRef = database.ref('trips/' + tripId);
+      tripRef.remove().then(() => {
+        displayTrips(currentPage); // Refresh the table after deletion
+      });
+    }
+
+    // Function to confirm deletion of a trip
+    function confirmDelete(tripId) {
+      var confirmDelete = confirm("Are you sure you want to delete this trip?");
+      if (confirmDelete) {
+        deleteTrip(tripId);
+      }
+    }
+
+    // Function to mark a trip as complete
+    function completeTrip(tripId) {
+      window.location.href = 'complettrip.html?tripId=' + tripId;
+    }
+     function advancepayment(tripId) {
+      window.location.href = 'newPayment_requisition.html?tripId=' + tripId;
+    }
+
+    // Function to print trip details
+    function printFO(tripId) {
+      var tripRef = database.ref('trips/' + tripId);
+      tripRef.once('value', function(snapshot) {
+        var trip = snapshot.val();
+        if (trip) {
+          var printWindow = window.open('', '', 'height=800,width=1000');
+          printWindow.document.write('<html><head><title>Freight Order</title>');
+          printWindow.document.write('<style>' +
+            '.fo-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 20px; border: 1px solid #000; }' +
+            '.fo-header, .fo-section { display: flex; justify-content: space-between; }' +
+            '.fo-section { margin-top: 10px; border-top: 1px solid #000; }' +
+            '.fo-section div { flex: 1; padding: 5px; border-right: 1px solid #000; }' +
+            '.fo-section div:last-child { border-right: none; }' +
+            '.fo-title { text-align: center; font-size: 24px; font-weight: bold; }' +
+            '.fo-subtitle { text-align: center; font-size: 18px; }' +
+            '.fo-label { font-weight: bold; }' +
+          '</style>');
+          printWindow.document.write('</head><body>');
+          printWindow.document.write('<div class="fo-container">');
+          printWindow.document.write('<div class="fo-header"><div>ELROI TRANSPORT and Logistics</div><div>FREIGHT ORDER</div></div>');
+          printWindow.document.write('<div class="fo-header"><div>Truck/Trailer No.: ' + trip.plateNumber + '</div><div>Date: ' + formatDate(trip.loadingDate) + '</div></div>');
+          printWindow.document.write('<div class="fo-header"><div>Capacity: ' + "_____________" + '</div><div>Freight Reg. No.: ' + trip.tripID + '</div></div>');
+          
+          printWindow.document.write('<div class="fo-section"><div class="fo-label">Shipper</div><div class="fo-label">Consignee</div></div>');
+          printWindow.document.write('<div class="fo-section"><div>Name: ' + trip.shipperName + '<br>Address: ' + "_____________" + '</div><div>Name: ' + trip.consigneename + '<br>Address: ' + trip.consigneeadress + '</div></div>');
+          
+          printWindow.document.write('<div class="fo-section"><div>City: ' + "_____________"  + '</div><div>Province: ' + trip.shipperProvince + '</div><div>Origin Code No.: ' + "_____________" + '</div></div>');
+          printWindow.document.write('<div class="fo-section"><div>City: ' + trip.consigneeadress + '</div><div>Province: ' + trip.consigneeadress + '</div></div>');
+
+          printWindow.document.write('<div class="fo-section"><div class="fo-label">Description</div><div class="fo-label">Count</div></div>');
+          printWindow.document.write('<div class="fo-section"><div>' + "_____________________" + '</div><div>' + "_____________________" + '</div></div>');
+          
+          printWindow.document.write('<div class="fo-section"><div class="fo-label">Commodity Type</div><div class="fo-label">Quintals</div><div class="fo-label">Kilometre</div><div class="fo-label">Tariff</div><div class="fo-label">Freight Charge</div></div>');
+          printWindow.document.write('<div class="fo-section"><div>' + trip.cargoType + '</div><div>' + trip.totalQuintal + '</div><div>' + trip.kmCovered + '</div><div>' + trip.tariffPerQuintal + '</div><div>' + trip.expectedRevenue + '</div></div>');
+
+          printWindow.document.write('<div class="fo-section"><div class="fo-label">Loading Completed</div><div class="fo-label">Unloading Completed</div></div>');
+          printWindow.document.write('<div class="fo-section"><div>Date: ' + formatDate(trip.loadingDate) + '<br>Time: ' + trip.loadingTime + '</div><div>Date: ' + formatDate(trip.unloadingDate) + '<br>Time: ' + trip.unloadingTime + '</div></div>');
+          
+          printWindow.document.write('<div class="fo-section"><div class="fo-label">Signature of Dispatcher</div><div class="fo-label">Commission Received</div><div class="fo-label">Delivery Driver</div></div>');
+          printWindow.document.write('<div class="fo-section"><div>Name: ' + "_____________________"+ '<br>Signature: ' + "_____________________" + '</div><div>Name: ' + "_____________________" + '<br>Signature: ' + "_______________"+ '</div><div>Name: ' + trip.driverName + '<br>Signature: ' + "_____________________"+ '</div></div>');
+          
+          printWindow.document.write('</div>');
+          printWindow.document.write('</body></html>');
+          printWindow.document.close();
+          printWindow.print();
+        }
+      });
+    }
+
+    // Call the function to display trips when the page loads
+    window.onload = function() {
+      displayTrips(currentPage);
+    };
+
+    document.getElementById("toggleChat").addEventListener("click", function() {
+      var chatWrapper = document.getElementById("dialogflowChatWrapper");
+      if (chatWrapper.style.display === "none" || chatWrapper.style.display === "") {
+        chatWrapper.style.display = "block";
+      } else {
+        chatWrapper.style.display = "none";
+      }
+    });
+
+    // Listen for messages from the parent page
+    window.addEventListener("message", function(event) {
+      if (event.data === "toggleChat") {
+        var chatWrapper = document.getElementById("dialogflowChatWrapper");
+        if (chatWrapper.style.display === "none" || chatWrapper.style.display === "") {
+          chatWrapper.style.display = "block";
+        } else {
+          chatWrapper.style.display = "none";
+        }
+      }
+    }, false);
+    function editTrip(tripId) {
+  window.location.href = 'edittrip.html?tripId=' + tripId;
+}
+  </script>
+</body>
+</html>

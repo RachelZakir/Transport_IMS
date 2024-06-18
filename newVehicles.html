@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Registration</title>
+  <style>
+    body {
+      background-image: url('log.jpg');
+      background-size: cover; 
+      background-repeat: no-repeat;
+      background-color: #f0f0f0; 
+      width: 100%;
+      height: 100vh; /* 100% of the viewport height */
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .header {
+      background-color: #ffffff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .dashboard-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: bold;
+    }
+
+    .field input[type="text"],
+    .field select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .save-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .save-button:hover {
+      background-color: #45a049;
+    }
+
+    .save-button:focus {
+      outline: none;
+    }
+  </style>
+  <script src="session.js"></script>
+   <iframe src="chatbot.html" width="400" height="500" style="position: fixed; bottom: 0; right: 0; border: none;"></iframe>
+</head>
+<body>
+  <div class="header">
+    <h1>Vehicle Registration Form</h1>
+  </div>
+
+  <div class="dashboard-container">
+    <form id="vehicleForm">
+      <div class="field">
+        <label for="plateNumber">Plate Number:</label>
+        <input type="text" id="plateNumber" required>
+      </div>
+      <div class="field">
+        <label for="vehicle_type">Vehicle Type:</label>
+        <select id="vehicle_type" name="vehicle_type" required>
+          <option value="Motorcycle">Motorcycle</option>
+          <option value="Light Vehicle">Light Vehicle</option>
+          <option value="Van">Van</option>
+          <option value="Truck">Truck</option>
+          <option value="Liquid cargo">Liquid Cargo</option>
+        </select>
+      </div>
+      
+      <div class="field">
+        <label for="chassisNumber">Chassis Number:</label>
+        <input type="text" id="chassisNumber" required>
+      </div>
+      
+      <div class="field">
+        <label for="modelNumber">Model Number:</label>
+        <input type="text" id="modelNumber" required>
+      </div>
+      
+      <div class="field">
+        <label for="motorNumber">Motor Number:</label>
+        <input type="text" id="motorNumber" required>
+      </div>
+      
+      <div class="field">
+        <label for="yearOfMaking">Year of Making:</label>
+        <input type="number" id="yearOfMaking" required>
+      </div>
+      
+      <div class="field">
+        <label for="capacity">Capacity in Quintal:</label>
+        <input type="number" id="capacity" required>
+      </div>
+      
+      <div class="field" style="text-align: center;">
+        <button type="submit" class="save-button">Save</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+  <script>
+    // Initialize Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+      authDomain: "el-roi-48b9f.firebaseapp.com",
+      databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "el-roi-48b9f",
+      storageBucket: "el-roi-48b9f.appspot.com",
+      messagingSenderId: "402630086025",
+      appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+    };
+    firebase.initializeApp(firebaseConfig);
+    
+    // Get a reference to the database service
+    const database = firebase.database();
+    
+    // Add event listener to form submission
+    document.getElementById('vehicleForm').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent default form submission
+      
+      // Get form data
+      const plateNumber = document.getElementById('plateNumber').value;
+      const vehicleType = document.getElementById('vehicle_type').value;
+      const chassisNumber = document.getElementById('chassisNumber').value;
+      const modelNumber = document.getElementById('modelNumber').value;
+      const motorNumber = document.getElementById('motorNumber').value;
+      const yearOfMaking = document.getElementById('yearOfMaking').value;
+      const capacity = document.getElementById('capacity').value;
+      
+      // Normalize data
+      const normalizedPlateNumber = plateNumber.toLowerCase();
+      const normalizedChassisNumber = chassisNumber.toLowerCase();
+
+      // Check if the Plate Number already exists in the database
+      database.ref('vehicles/').orderByChild('normalizedPlateNumber').equalTo(normalizedPlateNumber).once('value').then(snapshot => {
+        if (snapshot.exists()) {
+          // Plate Number already exists, show error message
+          alert('Plate Number already exists. Please use a different Plate Number.');
+          throw new Error('Plate Number already exists');
+        } else {
+          // Plate Number doesn't exist, proceed to check Chassis Number
+          return database.ref('vehicles').orderByChild('normalizedChassisNumber').equalTo(normalizedChassisNumber).once('value');
+        }
+      }).then(snapshot => {
+        if (snapshot.exists()) {
+          // Chassis Number already exists, show error message
+          alert('Chassis Number already exists. Please use a different Chassis Number.');
+          throw new Error('Chassis Number already exists');
+        } else {
+          // All fields are unique, proceed to save data
+          return database.ref('vehicles/' + normalizedPlateNumber).set({
+            plateNumber: plateNumber,
+            normalizedPlateNumber: normalizedPlateNumber,
+            vehicleType: vehicleType,
+            chassisNumber: chassisNumber,
+            normalizedChassisNumber: normalizedChassisNumber,
+            modelNumber: modelNumber,
+            motorNumber: motorNumber,
+            yearOfMaking: yearOfMaking,
+            capacity: capacity
+          });
+        }
+      }).then(() => {
+        // Data saved successfully
+        alert('Vehicle data saved successfully!');
+        // Optionally, you can reset the form after saving
+        document.getElementById('vehicleForm').reset();
+        window.history.back();
+      }).catch(error => {
+        if (error.message !== 'Plate Number already exists' && error.message !== 'Chassis Number already exists') {
+          // Handle other errors
+          console.error('Error saving data:', error);
+          alert('An error occurred while saving vehicle data. Please try again later.');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

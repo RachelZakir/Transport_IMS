@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Assist Drivers</title>
+  <style>
+   body {
+      background-image: url('log.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-color: #f0f0f0;
+      width: 100%;
+      height: 100vh; /* 100% of the viewport height */
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #ffffff;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      margin: 0;
+    }
+
+    .buttons-container {
+      display: flex;
+      align-items: ;
+    }
+
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .button:last-child {
+      margin-right: 0;
+    }
+
+    /* Dashboard container styles */
+    .dashboard-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      backdrop-filter: blur(5px); /* Apply blur effect */
+      display: flex; /* Use flexbox */
+    }
+
+    .column {
+      flex: 1; /* Equal width for both columns */
+      padding: 0 30px; /* Add padding between columns */
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: bold;
+    }
+
+    .field input[type="text"],
+    .field select,
+    .field input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .field.loading-unloading-date {
+      text-align: left;
+    }
+  </style>
+  <script src="session.js"></script>
+   <iframe src="chatbot.html" width="400" height="500" style="position: fixed; bottom: 0; right: 0; border: none;"></iframe>
+</head>
+<body>
+  <div class="header">
+    <h1>Edit Assist Drivers</h1>
+  </div>
+  <div class="dashboard-container">
+    <form id="driverForm">
+      <div class="field">
+        <label for="assist_driver_id">Assist Driver's ID:</label>
+        <input type="text" id="assist_driver_id" name="assist_driver_id" readonly>
+      </div>
+      <div class="field">
+        <label for="assist_driver_name">Full Name:</label>
+        <input type="text" id="assist_driver_name" name="assist_driver_name" required>
+      </div>
+      <div class="field">
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" min="18" required>
+      </div>
+      <div class="field">
+        <label for="sex">Sex:</label>
+        <select id="sex" name="sex" required>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="plateNumbers">Assigned vehicle Plate Number:</label>
+        <input list="plateNumbers" id="plateNumbers" name="plateNumbers" required>
+        <datalist id="plateNumbers"></datalist>
+      </div>
+      <div class="field">
+        <label for="phone_number">Phone Number:</label>
+        <input type="text" id="phone_number" name="phone_number" required>
+      </div>
+      <div class="field">
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" required>
+      </div>
+      <div class="field" style="text-align: center;">
+        <button type="submit" class="update-button">Update</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+  <script>
+    // Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+      authDomain: "el-roi-48b9f.firebaseapp.com",
+      databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "el-roi-48b9f",
+      storageBucket: "el-roi-48b9f.appspot.com",
+      messagingSenderId: "402630086025",
+      appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Reference to the Firebase database
+    var database = firebase.database();
+
+    function populateAssistDriverData(assist_driver_id) {
+      var assdriverRef = database.ref('assist_drivers/' + assist_driver_id);
+      assdriverRef.once('value', function(snapshot) {
+        var assdriverData = snapshot.val();
+        if (assdriverData) {
+          // Populate form fields with driver data for editing
+          document.getElementById('assist_driver_id').value = assdriverData.assist_driver_id;
+          document.getElementById('assist_driver_name').value = assdriverData.assist_driver_name;
+          document.getElementById('age').value = assdriverData.age;
+          document.getElementById('sex').value = assdriverData.sex;
+          document.getElementById('plateNumbers').value = assdriverData.plateNumbers;
+          document.getElementById('phone_number').value = assdriverData.phone_number;
+          document.getElementById('address').value = assdriverData.address;
+        } else {
+          console.log('Assist Driver data not found.');
+        }
+      });
+    }
+
+    // Call populateDriverData when DOM content is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      var urlParams = new URLSearchParams(window.location.search);
+      var assist_driver_id = urlParams.get('assist_driver_id');
+      if (assist_driver_id) {
+        populateAssistDriverData(assist_driver_id);
+      } else {
+        console.log('Assist Driver ID not found in URL.');
+      }
+    });
+   function populatePlateNumberDropdown() {
+  const plateNumberDatalist = document.getElementById("plateNumbers");
+  const vehiclesRef = database.ref('vehicles');
+
+  vehiclesRef.once('value', function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      const plateNumber = childSnapshot.val().plate_number; // Correct field name
+      const option = document.createElement("option");
+      option.value = plateNumber;
+      plateNumberDatalist.appendChild(option);
+    });
+  });
+}
+
+
+    // Call the function to populate plate number dropdown
+    populatePlateNumberDropdown();
+
+    // Function to update driver data in Firebase
+    function updateAssistDriverData(event) {
+      event.preventDefault(); // Prevent form submission
+
+      var assist_driver_id = document.getElementById('assist_driver_id').value;
+      var assist_driver_name = document.getElementById('assist_driver_name').value;
+      var age = document.getElementById('age').value;
+      var sex = document.getElementById('sex').value;
+      var plate_number = document.getElementById('plateNumbers').value;
+      var phone_number = document.getElementById('phone_number').value;
+      var address = document.getElementById('address').value;
+
+      // Check if name is a string
+      if (typeof assist_driver_name !== 'string' || assist_driver_name.trim().length === 0) {
+        alert('Assist Driver name must be a non-empty string.');
+        return;
+      }
+
+      // Check if all fields are filled
+      if (!assist_driver_name || !age || !sex || !plate_number || !phone_number || !address) {
+        alert('All fields are required.');
+        return;
+      }
+
+      // Update driver data
+      database.ref('assist_drivers/' + assist_driver_id).update({
+        assist_driver_id: assist_driver_id,
+        assist_driver_name: assist_driver_name,
+        age: age,
+        sex: sex,
+        plateNumbers: plate_number,
+        phone_number: phone_number,
+        address: address
+      }, function(error) {
+        if (error) {
+          console.error('Error updating Assist driver data:', error);
+        } else {
+          console.log('Assist Driver data updated successfully.');
+          // Go back to previous page
+          window.history.back();
+        }
+      });
+    }
+
+    // Attach event listener to the form
+    document.getElementById('driverForm').addEventListener('submit', updateAssistDriverData);
+  </script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User</title>
+  <style>
+    body {
+      background-image: url('log.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-color: #f0f0f0;
+      width: 100%;
+      height: 100vh; /* 100% of the viewport height */
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #ffffff;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      margin: 0;
+    }
+
+    .buttons-container {
+      display: flex;
+      align-items: ;
+    }
+
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .button:last-child {
+      margin-right: 0;
+    }
+
+    /* Dashboard container styles */
+    .dashboard-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      backdrop-filter: blur(5px); /* Apply blur effect */
+      display: flex; /* Use flexbox */
+    }
+
+    .column {
+      flex: 1; /* Equal width for both columns */
+      padding: 0 30px; /* Add padding between columns */
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: bold;
+    }
+
+    .field input[type="text"],
+    .field select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    /* Move loading date and unloading date to the bottom of the first column */
+    .field.loading-unloading-date {
+      text-align: left;
+    }
+  </style>
+  <script src="session.js"></script>
+   <iframe src="chatbot.html" width="400" height="500" style="position: fixed; bottom: 0; right: 0; border: none;"></iframe>
+</head>
+<body>
+  <div class="header">
+    <h1>Please Insert User Data You need to Edit</h1>
+    <div class="buttons-container"></div>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="row">
+      <div class="field">
+        <label for="fullName">User Full Name:</label>
+        <input type="text" id="fullName" required>
+      </div>
+      <div class="field">
+        <label for="userID">User ID:</label>
+        <input type="text" id="userID" readonly required>
+      </div>
+      <div class="field">
+        <label for="userName">Username:</label>
+        <input type="text" id="userName" required>
+      </div>
+      <div class="field">
+        <label for="password">Password:</label>
+        <input type="text" id="password" required>
+      </div>
+      <div class="field">
+        <label for="title">User Role:</label>
+        <select id="title" name="title" required>
+          <option value="Admin">Admin</option>
+          <option value="CEO">CEO</option>
+          <option value="Data Encoder">Data Encoder</option>
+          <option value="Dispatcher">Dispatcher</option>
+          <option value="Transport Manager">Transport Manager</option>
+        </select>
+      </div>
+      <div class="field">
+        <button class="button" onclick="updateUserData()">Update</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+  <script>
+    // Initialize Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+      authDomain: "el-roi-48b9f.firebaseapp.com",
+      databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "el-roi-48b9f",
+      storageBucket: "el-roi-48b9f.appspot.com",
+      messagingSenderId: "402630086025",
+      appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    var database = firebase.database();
+
+    // Function to extract query parameters from URL
+    function getQueryParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    function fetchAndDisplayUserData() {
+      const userId = getQueryParam('userId');
+      console.log('UserID:', userId); // Debug statement
+      if (userId) {
+        var userRef = database.ref('users/' + userId);
+        userRef.once('value', function(snapshot) {
+          var userData = snapshot.val();
+          console.log('UserData:', userData); // Debug statement
+          if (userData) {
+            // Populate form fields with userData
+            document.getElementById('fullName').value = userData.fullName;
+            document.getElementById('userID').value = userData.userID;
+            document.getElementById('userName').value = userData.userName;
+            document.getElementById('password').value = userData.password;
+            document.getElementById('title').value = userData.title;
+          } else {
+            alert('User data not found.');
+          }
+        });
+      } else {
+        alert('User ID query parameter not found.');
+      }
+    }
+
+    window.onload = fetchAndDisplayUserData;
+
+    function updateUserData() {
+      var fullName = document.getElementById("fullName").value.trim();
+      var userID = document.getElementById("userID").value.trim();
+      var userName = document.getElementById("userName").value.trim();
+      var password = document.getElementById("password").value.trim();
+      var title = document.getElementById("title").value;
+
+      if (!fullName || !userName || !password || !title) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      if (password.length < 8) {
+        alert("Password must be at least 8 characters long.");
+        return;
+      }
+
+      var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(userName)) {
+        alert("Username must be in a valid email format.");
+        return;
+      }
+
+      // Check for duplicates
+      database.ref('users').once('value')
+        .then(function(snapshot) {
+          let isDuplicate = false;
+
+          snapshot.forEach(function(childSnapshot) {
+            var user = childSnapshot.val();
+            if ((user.fullName === fullName || user.userName === userName || user.password === password) && user.userID !== userID) {
+              isDuplicate = true;
+              return true; // Exit loop if duplicate found
+            }
+          });
+
+          if (isDuplicate) {
+            alert("Full name, username, and password must be different from other users.");
+            return;
+          }
+
+          // No duplicates, proceed with update
+          var userDataRef = database.ref('users/' + userID);
+          userDataRef.update({
+            fullName: fullName,
+            userName: userName,
+            password: password,
+            title: title
+          }, function(error) {
+            if (error) {
+              alert("Failed to update user data: " + error.message);
+            } else {
+              alert("User data updated successfully!");
+              history.back();
+            }
+          });
+        })
+        .catch(function(error) {
+          alert("Error querying database: " + error.message);
+        });
+    }
+  </script>
+</body>
+</html>

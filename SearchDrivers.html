@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Drivers</title>
+  <style>
+    body {
+      background-image: url('log.jpg');
+      background-size: cover; 
+      background-repeat: no-repeat;
+      background-color: #f0f0f0; 
+      width: 100%;
+      height: 100vh; /* 100% of the viewport height */
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #ffffff;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      margin: 0;
+    }
+
+    .buttons-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .button:last-child {
+      margin-right: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: white;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .edit-delete-buttons button {
+      background-color: #f44336;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+
+    .edit-delete-buttons button.edit {
+      background-color: #4CAF50;
+    }
+  </style>
+  <script src="session.js"></script> 
+</head>
+<body>
+  <div class="header">
+    <h1>Search Drivers</h1>
+    <div class="buttons-container">
+      <!-- Add button for searching drivers -->
+      <button class="button" onclick="searchDrivers()">Search</button>
+    </div>
+  </div>
+
+  <div class="dashboard-container">
+    <!-- Form to enter the driver name for searching -->
+    <form id="searchForm">
+      <div class="field">
+        <label for="search_name">Search by Name:</label>
+        <input type="text" id="search_name" name="search_name" required>
+      </div>
+    </form>
+
+    <!-- Container to display search results -->
+    <div id="searchResults"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+  <script>
+    // Firebase configuration
+   var firebaseConfig = {
+    apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+    authDomain: "el-roi-48b9f.firebaseapp.com",
+    databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "el-roi-48b9f",
+    storageBucket: "el-roi-48b9f.appspot.com",
+    messagingSenderId: "Y402630086025",
+    appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  // Reference to the Firebase database
+  var database = firebase.database();
+
+  // Function to search drivers by name
+  // Function to search drivers by name
+function searchDrivers() {
+  var searchName = document.getElementById('search_name').value.trim().toLowerCase();
+
+  // Query drivers by name
+  database.ref('drivers').once('value', function(snapshot) {
+    var resultsContainer = document.getElementById('searchResults');
+    resultsContainer.innerHTML = ''; // Clear previous search results
+
+    var matchingDrivers = [];
+
+    snapshot.forEach(function(childSnapshot) {
+      var driverData = childSnapshot.val();
+      var driverID = childSnapshot.key;
+      var driverName = driverData.driver_name.toLowerCase();
+
+      // Check if the driver's name contains the search term
+      if (driverName.includes(searchName)) {
+        matchingDrivers.push({
+          id: driverID,
+          data: driverData
+        });
+      }
+    });
+
+    if (matchingDrivers.length > 0) {
+      // Create table for displaying search results
+      var table = document.createElement('table');
+      var headerRow = table.insertRow();
+      var headers = ['Driver ID', 'Name', 'Age', 'Sex', 'License Number', 'Phone Number', 'Address', 'Vehicle Type', 'Actions'];
+      headers.forEach(function(headerText) {
+        var th = document.createElement('th');
+        th.textContent = headerText;
+        headerRow.appendChild(th);
+      });
+
+      // Add search results to the table
+      matchingDrivers.forEach(function(driver) {
+        var driverID = driver.id;
+        var driverData = driver.data;
+
+        var row = table.insertRow();
+        var cells = [
+          driverID,
+          driverData.driver_name,
+          driverData.age,
+          driverData.sex,
+          driverData.license_number,
+          driverData.phone_number,
+          driverData.address,
+          driverData.vehicle_type,
+          ''
+        ];
+
+        cells.forEach(function(cellData, index) {
+          var cell = row.insertCell(index);
+          cell.textContent = cellData;
+        });
+
+        // Add edit and delete buttons
+        var editDeleteCell = row.insertCell();
+        var editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.className = 'edit';
+        editButton.onclick = function() {
+          editDriver(driverID);
+        };
+        var deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.onclick = function() {
+          deleteDriver(driverID);
+        };
+        editDeleteCell.appendChild(editButton);
+        editDeleteCell.appendChild(deleteButton);
+      });
+
+      // Add colspan to the "Actions" header
+      var actionsHeader = headerRow.cells[headerRow.cells.length - 1];
+      actionsHeader.colSpan = 2;
+
+      resultsContainer.appendChild(table);
+    } else {
+      // Display message if no matching drivers found
+      var message = document.createElement('p');
+      message.textContent = 'No matching drivers found.';
+      resultsContainer.appendChild(message);
+    }
+  });
+}
+
+  // Function to delete a driver
+  function deleteDriver(driverID) {
+    var confirmation = confirm('Are you sure you want to delete this driver?');
+    if (confirmation) {
+      database.ref('drivers/' + driverID).remove()
+        .then(function() {
+          alert('Driver deleted successfully!');
+          searchDrivers(); // Refresh search results after deletion
+        })
+        .catch(function(error) {
+          console.error('Error deleting driver:', error);
+          alert('Error deleting driver. Please try again.');
+        });
+    }
+  }
+
+  // Function to edit a driver
+  function editDriver(driverID) {
+    // You can implement the edit functionality according to your requirements
+    // For example, you can open a modal with a form pre-filled with the driver's data
+    alert('Edit functionality is not implemented yet.');
+  }
+  </script>
+</body>
+</html>

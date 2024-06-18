@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trip Cost</title>
+  <style>
+    body {
+      background-image: url('log.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-color: #f0f0f0;
+      width: 100%;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #ffffff;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      margin: 0;
+    }
+
+    .buttons-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .button:last-child {
+      margin-right: 0;
+    }
+
+    .dashboard-container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(5px);
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .column {
+      flex: 1;
+      padding: 0 15px;
+      min-width: 400px; /* Ensure that columns do not shrink below a certain width */
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: bold;
+    }
+
+    .field input[type="text"],
+    .field select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+  <script src="session.js"></script>
+   <iframe src="chatbot.html" width="400" height="500" style="position: fixed; bottom: 0; right: 0; border: none;"></iframe>
+</head>
+<body>
+  <div class="header">
+    <h1>Please Insert Trip Cost Detail</h1>
+    <div class="buttons-container"></div>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="column" id="column1">
+      <div class="header">
+        <h1 onclick="toggleColumn('column1')">Cost Details</h1>
+      </div>
+      <div class="field">
+        <label for="driversAllowance">Driver's Allowance:</label>
+        <input type="text" id="driversAllowance" onchange="calculateTotalCost()" required>
+      </div>
+      <div class="field">
+        <label for="loadingUnloading">Loading and Unloading:</label>
+        <input type="text" id="loadingUnloading" onchange="calculateTotalCost()" required>
+      </div>
+      <div class="field">
+        <label for="parking">Parking:</label>
+        <input type="text" id="parking" onchange="calculateTotalCost()" required>
+      </div>
+      <div class="field">
+        <label for="fuelCost">Fuel Cost:</label>
+        <input type="text" id="fuelCost" onchange="calculateTotalCost()" required>
+      </div>
+      <div class="field">
+        <label for="fuelLiter">Fuel Liter:</label>
+        <input type="text" id="fuelLiter" onchange="calculateTotalCost()" required>
+      </div>
+      <div class="field">
+        <label for="tireMaintenance">Tire Maintenance:</label>
+        <input type="text" id="tireMaintenance" onchange="calculateTotalCost()" required>
+      </div>
+      <div class="field">
+        <label for="washing">Washing:</label>
+        <input type="text" id="washing" onchange="calculateTotalCost()" required>
+      </div>
+      <div class="field">
+        <label for="Others">Others:</label>
+        <input type="text" id="Others" onchange="calculateTotalCost()" required>
+      </div>
+      <div class="field">
+        <label for="assistantDriverAllowance">Ass. Driver Allowance:</label>
+        <input type="text" id="assistantDriverAllowance" onchange="calculateTotalCost()" required>
+      </div>
+    </div>
+    <div class="column" id="column2">
+      <div class="header">
+        <h1 onclick="toggleColumn('column2')"> Summary </h1>
+      </div>
+      <div class="field">
+        <label for="totalCost">Total Cost:</label>
+        <input type="text" id="totalCost" readonly >
+      </div>
+      <div class="field">
+        <label for="expectedRevenue">Expected Revenue:</label>
+        <input type="text" id="expectedRevenue" readonly>
+      </div>
+      <div class="field">
+        <label for="balance">Net Income:</label>
+        <input type="text" id="balance" readonly>
+      </div>
+      <div class="field">
+        <label for="advancepayment">Advance Payment:</label>
+        <input type="text" id="advancepayment" readonly>
+      </div>
+      <div class="field">
+        <label for="balanceDue">Driver Balance Due:</label>
+        <input type="text" id="balanceDue" readonly>
+      </div>
+      <div class="field">
+        <label for="assistantAdvancePayment">Assistant Advance Payment:</label>
+        <input type="text" id="assistantAdvancePayment" readonly>
+      </div>
+      <div class="field">
+        <label for="assistantBalanceDue">Assist Balance Due:</label>
+        <input type="text" id="assistantBalanceDue" readonly>
+      </div>
+      <div class="field">
+        <label for="paymentRecipient">Payment Recipient:</label>
+        <select id="paymentRecipient" onchange="togglePaymentOptions()">
+          <option value="driver">Driver</option>
+          <option value="company">Company</option>
+        </select>
+      </div>
+      <div class="field" id="driverPaymentOptions" style="display: none;">
+        <label for="driverName">Driver Name:</label>
+        <input type="text" id="driverName">
+      </div>
+      <div class="field">
+        <button class="button" onclick="settleTrip()">Settle Trip</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBfhRV585zfq2lEBaJTe91ZqJEqWHYMWYQ",
+      authDomain: "kerchanshe-transport.firebaseapp.com",
+      databaseURL: "https://kerchanshe-transport-default-rtdb.firebaseio.com",
+      projectId: "kerchanshe-transport",
+      storageBucket: "kerchanshe-transport.appspot.com",
+      messagingSenderId: "546857450183",
+      appId: "1:546857450183:web:a7c9bb8118505d03d61ce2",
+      measurementId: "G-XSE9TLLDVX"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    var database = firebase.database();
+
+    function isValidNumber(value) {
+      return !isNaN(parseFloat(value)) && isFinite(value);
+    }
+
+    function calculateTotalCost() {
+      var driversAllowance = parseFloat(document.getElementById("driversAllowance").value.trim()) || 0;
+      var assistantDriverAllowance = parseFloat(document.getElementById("assistantDriverAllowance").value.trim()) || 0;
+      var loadingUnloading = parseFloat(document.getElementById("loadingUnloading").value.trim()) || 0;
+      var parking = parseFloat(document.getElementById("parking").value.trim()) || 0;
+      var fuelCost = parseFloat(document.getElementById("fuelCost").value.trim()) || 0;
+      var fuelLiter = parseFloat(document.getElementById("fuelLiter").value.trim()) || 0;
+      var tireMaintenance = parseFloat(document.getElementById("tireMaintenance").value.trim()) || 0;
+      var washing = parseFloat(document.getElementById("washing").value.trim()) || 0;
+      var others = parseFloat(document.getElementById("Others").value.trim()) || 0;
+      var totalCost = driversAllowance + assistantDriverAllowance + loadingUnloading + parking + fuelCost + tireMaintenance + washing + others;
+      document.getElementById("totalCost").value = totalCost.toFixed(2);
+      calculateBalance();
+      calculateBalanceDue();
+    }
+
+    function retrieveExpectedRevenue(paymentRequisitionID) {
+      var paymentRequisitionRef = database.ref('Payment_requisition/' + paymentRequisitionID);
+      paymentRequisitionRef.once('value', function(snapshot) {
+        var data = snapshot.val();
+        if (data) {
+          var expectedRevenue = parseFloat(data.expectedRevenue) || 0;
+          var advancePayment = parseFloat(data.advancePayment) || 0;
+          var assistantAdvancePayment = parseFloat(data.AssadvancePayment) || 0;
+          document.getElementById("expectedRevenue").value = expectedRevenue.toFixed(2);
+          document.getElementById("advancepayment").value = advancePayment.toFixed(2);
+          document.getElementById("assistantAdvancePayment").value = assistantAdvancePayment.toFixed(2);
+          calculateBalance();
+          calculateBalanceDue();
+        } else {
+          alert("Payment requisition not found.");
+        }
+      });
+    }
+
+    function getPaymentRequisitionIDFromUrl() {
+      var urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('paymentRequisitionID');
+    }
+
+    function calculateBalance() {
+      var expectedRevenue = parseFloat(document.getElementById("expectedRevenue").value.trim()) || 0;
+      var totalCost = parseFloat(document.getElementById("totalCost").value.trim()) || 0;
+      var balance = expectedRevenue - totalCost;
+      document.getElementById("balance").value = balance.toFixed(2);
+    }
+
+    function calculateBalanceDue() {
+  var advancePayment = parseFloat(document.getElementById("advancepayment").value.trim()) || 0;
+  var assistantAdvancePayment = parseFloat(document.getElementById("assistantAdvancePayment").value.trim()) || 0;
+  var totalCost = parseFloat(document.getElementById("totalCost").value.trim()) || 0;
+  var driverBalanceDue = totalCost - advancePayment;
+  var assistantBalanceDue = totalCost - assistantAdvancePayment - parseFloat(document.getElementById("assistantDriverAllowance").value.trim()) || 0;
+  document.getElementById("balanceDue").value = driverBalanceDue.toFixed(2);
+  document.getElementById("assistantBalanceDue").value = assistantBalanceDue.toFixed(2);
+}
+
+
+    function settleTrip() {
+      var paymentRequisitionID = getPaymentRequisitionIDFromUrl();
+      if (!paymentRequisitionID) {
+        alert("Payment requisition ID is missing.");
+        return;
+      }
+
+      var totalCost = parseFloat(document.getElementById("totalCost").value.trim()) || 0;
+      var expectedRevenue = parseFloat(document.getElementById("expectedRevenue").value.trim()) || 0;
+      var balance = parseFloat(document.getElementById("balance").value.trim()) || 0;
+      var advancePayment = parseFloat(document.getElementById("advancepayment").value.trim()) || 0;
+      var assistantAdvancePayment = parseFloat(document.getElementById("assistantAdvancePayment").value.trim()) || 0;
+      var driverBalanceDue = parseFloat(document.getElementById("balanceDue").value.trim()) || 0;
+      var assistantBalanceDue = parseFloat(document.getElementById("assistantBalanceDue").value.trim()) || 0;
+      var paymentRecipient = document.getElementById("paymentRecipient").value;
+      var driverName = document.getElementById("driverName").value.trim();
+
+      var updates = {
+        totalCost: totalCost,
+        expectedRevenue: expectedRevenue,
+        netIncome: balance,
+        advancePayment: advancePayment,
+        assistantAdvancePayment: assistantAdvancePayment,
+        driverBalanceDue: driverBalanceDue,
+        assistantBalanceDue: assistantBalanceDue,
+        paymentRecipient: paymentRecipient,
+        status: "settled"
+      };
+
+      if (paymentRecipient === "driver" && driverName) {
+        updates.driverName = driverName;
+      }
+
+      var paymentRequisitionRef = database.ref('Payment_requisition/' + paymentRequisitionID);
+      paymentRequisitionRef.update(updates, function(error) {
+        if (error) {
+          alert("Failed to settle trip: " + error.message);
+        } else {
+          alert("Trip settled successfully.");
+          history.back();
+        }
+      });
+    }
+
+    window.onload = function() {
+      var paymentRequisitionID = getPaymentRequisitionIDFromUrl();
+      if (paymentRequisitionID) {
+        retrieveExpectedRevenue(paymentRequisitionID);
+      }
+    };
+  </script>
+</body>
+</html>

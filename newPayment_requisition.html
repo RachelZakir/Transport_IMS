@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Requisition Detail</title>
+  <style>
+    body {
+      background-image: url('log.jpg');
+      background-size: cover; 
+      background-repeat: no-repeat;
+      background-color: #f0f0f0; 
+      width: 100%;
+      height: 100vh; 
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      background-color: #fff;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .buttons-container {
+      display: flex;
+      align-items: center;
+    }
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .button:last-child {
+      margin-right: 0;
+    }
+    .dashboard-container {
+      max-width: 100%;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: row;
+    }
+    .column {
+      flex: 1;
+      padding: 0 30px;
+    }
+    .field {
+      margin-bottom: 15px;
+    }
+    .field label {
+      display: block;
+      font-weight: bold;
+    }
+    .field input[type="text"],
+    .field input[type="datetime-local"],
+    .field input[list] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .field.loading-unloading-date {
+      text-align: left;
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Please Insert Payment Requisition Detail</h1>
+      <div class="buttons-container">
+        <!-- No buttons defined in the original code -->
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="column" id="column1">
+      <div class="header">
+        <h1 onclick="toggleColumn('column1')">Trip Details</h1>
+      </div>
+      <div class="field">
+        <label for="Payment_requisitionID">Payment Requisition ID:</label>
+        <input type="text" id="Payment_requisitionID" readonly>
+      </div>
+      <div class="field">
+        <label for="DriverName">Driver Name:</label>
+        <input type="text" id="DriverName" readonly>
+      </div>
+      <div class="field">
+        <label for="PlateNumber">Plate Number:</label>
+        <input type="text" id="PlateNumber" readonly>
+      </div>
+      <div class="field">
+        <label for="assistDriver">Assist Driver:</label>
+        <input list="assistDrivers" id="assistDriver">
+        <datalist id="assistDrivers">
+          <!-- Options will be populated dynamically -->
+        </datalist>
+      </div>
+      <div class="field">
+        <label for="PRDate">Payment Requested Date:</label>
+        <input type="datetime-local" id="PRDate">
+      </div>
+      <div class="field">
+        <label for="pickupAddress">Pick Up Address:</label>
+        <input type="text" id="pickupAddress" readonly>
+      </div>
+      <div class="field">
+        <label for="dropAddress">Drop Address:</label>
+        <input type="text" id="dropAddress">
+      </div>
+    </div>
+    <div class="column" id="column2">
+      <div class="header">
+        <h1 onclick="toggleColumn('column2')">Route Detail</h1>
+      </div>
+      <div class="field">
+        <label for="cargoType">Cargo Type:</label>
+        <input type="text" id="cargoType" readonly>
+      </div>
+      <div class="field">
+        <label for="kmCovered">Km Covered:</label>
+        <input type="text" id="kmCovered" readonly>
+      </div>
+      <div class="field">
+        <label for="totalQuintal">Total Quintal:</label>
+        <input type="text" id="totalQuintal" readonly >
+      </div>
+      <div class="field">
+        <label for="tariffPerQuintal">Tariff per Quintal:</label>
+        <input type="text" id="tariffPerQuintal" readonly >
+      </div>
+      <div class="field">
+        <label for="expectedRevenue">Expected Revenue:</label>
+        <input type="text" id="expectedRevenue" readonly>
+      </div>
+      <div class="field">
+  <label for="tripID">Freight Order(FO) Number:</label>
+  <input type="text" id="tripID" readonly>
+</div>
+    </div>
+    <div class="column" id="column3">
+      <div class="header">
+        <h1 onclick="toggleColumn('column3')">Advance Payment Detail</h1>
+      </div>
+      <div class="field">
+        <label for="advancePayment">Driver's Advance Payment Amount:</label>
+        <input type="number" id="advancePayment">
+      </div>
+      <div class="field">
+        <label for="tripStartDate">Trip Start Date:</label>
+        <input type="datetime-local" id="tripStartDate" onchange="calculateAssistantAllowance()">
+      </div>
+      <div class="field">
+        <label for="tripEndDate">Trip End Date:</label>
+        <input type="datetime-local" id="tripEndDate" onchange="calculateAssistantAllowance()">
+      </div>
+      <div class="field">
+        <label for="dailyRate">Assist Allowance Daily Rate:</label>
+        <input type="number" id="dailyRate" onchange="calculateAssistantAllowance()">
+      </div>
+      <div class="field">
+        <label for="AssadvancePayment">Assist's Advance Payment Amount:</label>
+        <input type="number" id="AssadvancePayment" readonly>
+      </div>
+      <div class="field">
+        <button class="button" onclick="askPayment()">Ask Payment</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+      authDomain: "el-roi-48b9f.firebaseapp.com",
+      databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "el-roi-48b9f",
+      storageBucket: "el-roi-48b9f.appspot.com",
+      messagingSenderId: "402630086025",
+      appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    var database = firebase.database();
+
+    function populateAssistDriverNameDropdown() {
+      var assistDriverDatalist = document.getElementById("assistDrivers");
+      var assistDriversRef = database.ref('assist_drivers');
+      assistDriversRef.once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var assistDriverName = childSnapshot.val().assist_driver_name;
+          var option = document.createElement("option");
+          option.value = assistDriverName;
+          assistDriverDatalist.appendChild(option);
+        });
+      });
+    }
+
+function populatetripData(tripID) {
+  var tripRef = database.ref('trips/' + tripID);
+
+  tripRef.once('value').then(function(snapshot) {
+    var tripData = snapshot.val();
+
+    if (tripData) {
+      document.getElementById("Payment_requisitionID").value = tripData.Payment_requisitionID || "";
+      document.getElementById("DriverName").value = tripData.driverName || "";
+      document.getElementById("PlateNumber").value = tripData.plateNumber || "";
+      document.getElementById("pickupAddress").value = tripData.pickupAddress || "";
+      document.getElementById("dropAddress").value = tripData.dropAddress || "";
+      document.getElementById("cargoType").value = tripData.cargoType || "";
+      document.getElementById("kmCovered").value = tripData.kmCovered || "";
+      document.getElementById("totalQuintal").value = tripData.totalQuintal || "";
+      document.getElementById("tariffPerQuintal").value = tripData.tariffPerQuintal || "";
+      document.getElementById("expectedRevenue").value = tripData.expectedRevenue || "";
+      document.getElementById("tripID").value = tripData.tripID || "";
+
+      console.log("Trip Data:", tripData);
+    } else {
+      console.log("No data found for trip ID:", tripID);
+    }
+  }).catch(function(error) {
+    console.error("Error fetching trip data:", error);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var tripID = urlParams.get('tripID');
+
+  if (tripID) {
+    populatetripData(tripID);
+  } else {
+    console.log('Trip ID not found in URL.');
+  }
+});
+
+
+
+    function generatePaymentRequisitionID() {
+      var tripIDField = document.getElementById("Payment_requisitionID");
+      var lastIDRef = database.ref('Payment_requisition').orderByKey().limitToLast(1);
+      lastIDRef.once('value', function(snapshot) {
+        if (snapshot.exists()) {
+          snapshot.forEach(function(childSnapshot) {
+            var lastID = childSnapshot.key;
+            var nextID = (parseInt(lastID) + 1).toString().padStart(5, '0');
+            tripIDField.value = nextID;
+          });
+        } else {
+          tripIDField.value = "00001";
+        }
+      }).catch(function(error) {
+        console.error("Error generating Payment Requisition ID:", error);
+      });
+    }
+
+    function askPayment() {
+      var paymentRequisitionID = document.getElementById("Payment_requisitionID").value;
+      var driverName = document.getElementById("DriverName").value.trim();
+      var plateNumber = document.getElementById("PlateNumber").value.trim();
+      var assistDriver = document.getElementById("assistDriver").value.trim();
+      var pickupAddress = document.getElementById("pickupAddress").value.trim();
+      var dropAddress = document.getElementById("dropAddress").value.trim();
+      var PRDate = document.getElementById("PRDate").value.trim();
+      var tripStartDate = document.getElementById("tripStartDate").value.trim();
+      var tripEndDate = document.getElementById("tripEndDate").value.trim();
+      var cargoType = document.getElementById("cargoType").value.trim();
+      var totalQuintal = document.getElementById("totalQuintal").value.trim();
+      var kmCovered = document.getElementById("kmCovered").value.trim();
+      var tariffPerQuintal = document.getElementById("tariffPerQuintal").value.trim();
+      var expectedRevenue = document.getElementById("expectedRevenue").value.trim();
+      var tripID = document.getElementById("tripID").value.trim();
+      var AssadvancePayment = document.getElementById("AssadvancePayment").value.trim();
+      var advancePayment = document.getElementById("advancePayment").value.trim();
+
+      if (!driverName || !plateNumber || !assistDriver || !pickupAddress || !dropAddress || !PRDate || !tripStartDate || !tripEndDate || !cargoType || !totalQuintal || !kmCovered || !tariffPerQuintal || !expectedRevenue || !tripID || !AssadvancePayment || !advancePayment) {
+        alert("Please fill out all required fields before requesting a payment.");
+        return;
+      }
+
+      var PRDateTime = new Date(PRDate);
+
+      database.ref('Payment_requisition/' + paymentRequisitionID).set({
+        paymentRequisitionID: paymentRequisitionID,
+        driverName: driverName,
+        plateNumber: plateNumber,
+        assistDriver: assistDriver,
+        pickupAddress: pickupAddress,
+        dropAddress: dropAddress,
+        PRDate: PRDate,
+        tripStartDate: tripStartDate,
+        tripEndDate: tripEndDate,
+        cargoType: cargoType,
+        totalQuintal: totalQuintal,
+        kmCovered: kmCovered,
+        tariffPerQuintal: tariffPerQuintal,
+        expectedRevenue: expectedRevenue,
+        tripID: tripID,
+        AssadvancePayment: AssadvancePayment,
+        advancePayment: advancePayment,
+        status: "Unsettled"
+      }).then(() => {
+        alert("Payment requested and details saved successfully!");
+        document.getElementById("DriverName").value = "";
+        document.getElementById("PlateNumber").value = "";
+        document.getElementById("assistDriver").value = "";
+        document.getElementById("pickupAddress").value = "";
+        document.getElementById("dropAddress").value = "";
+        document.getElementById("PRDate").value = "";
+        document.getElementById("tripStartDate").value = "";
+        document.getElementById("tripEndDate").value = "";
+        document.getElementById("cargoType").value = "";
+        document.getElementById("totalQuintal").value = "";
+        document.getElementById("kmCovered").value = "";
+        document.getElementById("tariffPerQuintal").value = "";
+        document.getElementById("expectedRevenue").value = "";
+        document.getElementById("tripID").value = "";
+        document.getElementById("AssadvancePayment").value = "";
+        document.getElementById("advancePayment").value = "";
+
+        generatePaymentRequisitionID();
+      }).catch((error) => {
+        console.error("Error requesting payment:", error);
+      });
+    }
+
+    function calculateAssistantAllowance() {
+      var tripStartDate = document.getElementById("tripStartDate").value;
+      var tripEndDate = document.getElementById("tripEndDate").value;
+      var dailyRate = parseFloat(document.getElementById("dailyRate").value.trim());
+
+      if (tripStartDate && tripEndDate && !isNaN(dailyRate)) {
+        var startDate = new Date(tripStartDate);
+        var endDate = new Date(tripEndDate);
+
+        if (startDate > endDate) {
+          alert("End date must be after start date.");
+          return;
+        }
+
+        var timeDifference = endDate.getTime() - startDate.getTime();
+        var daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24)) + 1;
+        var assistAllowance = daysDifference * dailyRate;
+
+        document.getElementById("AssadvancePayment").value = assistAllowance.toFixed(2);
+      }
+    }
+
+  </script>
+</body>
+</html>

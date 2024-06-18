@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      background-image: url('log.jpg');
+      background-size: cover; 
+      background-position: top right;
+      background-repeat: no-repeat;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+    .container {
+      max-width: 1500px;
+      margin: 0px auto 10px;
+      padding: 40px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 2;
+    }
+    h1 {
+      text-align: left;
+    }
+    .dashboard-section {
+      margin-bottom: 20px;
+    }
+    .dashboard-section h2 {
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    .report-container {
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .button {
+      display: inline-block;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .logo {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 2;
+    }
+    .bottom-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #greeting {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+  <script src="session.js"></script>
+</head>
+<body>
+  <div class="container">
+    <img src="logo.jpg" alt="Logo of My Website" class="logo">
+    <h1>Kerchanshe Transport And Logistics Admin Dashboard</h1>
+    
+    <!-- Buttons Section -->
+    <div class="dashboard-section">
+      <a class="button" href="Admindashboard.html">Dashboard</a>
+      <a class="button" href="trip.html">Trip</a>
+      <div class="dropdown">
+        <button class="button">Financial Summary</button>
+        <div class="dropdown-content">
+          <a href="monthly.html"><h5>Trip Financial Summary</h5></a>
+          <a href="DriversreportFilter.html"><h5>Drivers Financial Summary</h5></a>
+          <a href="shippersreport.html"><h5>Shippers Financial Summary</h5></a>
+          <a href="vehiclesreport.html"><h5>Vehicles Financial Summary</h5></a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="button">Resources</button>
+        <div class="dropdown-content">
+          <a href="Vehicles.html">Vehicles</a>
+          <a href="Drivers.html">Drivers</a>
+          <a href="Shiper.html">Shipper</a>
+          <a href="Agreement.html">Agreement</a>
+          <a href="assist.html">Assist Drivers</a>
+        </div>
+      </div>
+  <div class="dropdown">
+        <button class="button">Payment requisition</button>
+        <div class="dropdown-content">
+    <a href="Payment_requisition.html"><h5>Rayment requisition</h5></a>
+    <a href="monthly.html"><h5>Payment requisition Summary</h5></a>
+    <a href="DriversreportFilter.html"><h5>Drivers payment requisition Summary</h5></a>
+    <a href="shippersreport.html"><h5>Ass.Driver payment requisition Summary</h5></a>
+       </div>
+     </div>
+      <div class="dropdown">
+        <button class="button">Users</button>
+        <div class="dropdown-content">
+          <a href="user.html">User Credentials</a>
+          <a href="#">Data Encoder</a>
+          <a href="#">Dispatcher</a>
+          <a href="#">Transport Manager</a>
+          <a href="#">CEO</a>
+        </div>
+      </div>
+      <iframe src="chatbot.html" width="400" height="500" style="position: fixed; bottom: 0; right: 0; border: none;"></iframe>
+
+    </div>
+
+    <!-- Bottom Container -->
+    <div class="bottom-container">
+      <div class="dashboard-section">
+        <h2>Date and Time</h2>
+        <div id="dateTime"></div>
+      </div>
+      <div class="dashboard-section">
+        <h2>Greeting</h2>
+        <div id="greeting"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Function to display the current date and time
+    function updateDateTime() {
+      var now = new Date();
+      var dateTimeStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+      document.getElementById('dateTime').textContent = dateTimeStr;
+    }
+
+    // Call the function to update the date and time immediately
+    updateDateTime();
+
+    // Update the date and time every second
+    setInterval(updateDateTime, 1000);
+
+    // Function to display the greeting with the user's full name
+    function displayGreeting() {
+      var loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+      if (loggedInUser && loggedInUser.fullName) {
+        var greeting = 'Welcome, ' + loggedInUser.fullName + '!';
+        document.getElementById('greeting').textContent = greeting;
+      } else {
+        document.getElementById('greeting').textContent = 'Welcome!';
+      }
+    }
+
+    // Call the function to display the greeting
+    displayGreeting();
+  </script>
+</body>
+</html>

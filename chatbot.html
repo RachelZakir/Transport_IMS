@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Your CSS styles */
+    /* Styling for the toggle button */
+    #toggleChat {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      border-radius: 60%;
+      width: 60px;
+      height: 60px;
+      font-size: 16px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    #toggleChat:hover {
+      background-color: #0056b3;
+    }
+
+    #dialogflowChat {
+      display: none;
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 350px;
+      height: 430px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Toggle button for Dialogflow chat interface -->
+  <button id="toggleChat">Need Help?</button>
+
+  <!-- Dialogflow iframe -->
+  <iframe
+    id="dialogflowChat"
+    allow="microphone;"
+    src="https://console.dialogflow.com/api-client/demo/embedded/6b1176b0-16c8-4ffb-9e37-495f47d7ee58">
+  </iframe>
+
+  <script>
+    // Toggle function for the chat interface
+    document.getElementById("toggleChat").addEventListener("click", function() {
+      var chatFrame = document.getElementById("dialogflowChat");
+      if (chatFrame.style.display === "none" || chatFrame.style.display === "") {
+        chatFrame.style.display = "block";
+      } else {
+        chatFrame.style.display = "none";
+      }
+    });
+
+    // Listen for messages from the parent page
+    window.addEventListener("message", function(event) {
+      if (event.data === "toggleChat") {
+        var chatFrame = document.getElementById("dialogflowChat");
+        if (chatFrame.style.display === "none" || chatFrame.style.display === "") {
+          chatFrame.style.display = "block";
+        } else {
+          chatFrame.style.display = "none";
+        }
+      }
+    }, false);
+  </script>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shippers Financial Summary</title>
+  <style>
+    body {
+      background-image: url('log.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-color: #f0f0f0;
+      width: 100%;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    .header {
+      background-color: #ffffff;
+      padding: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h3 {
+      margin: 0;
+    }
+    .buttons-container {
+      display: flex;
+      align-items: center;
+    }
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .button-delete {
+      background-color: lightcoral;
+      color: white;
+    }
+    .button-edit {
+      background-color: lightblue;
+      color: white;
+    }
+    .button:last-child {
+      margin-right: 0;
+    }
+    .dashboard-container {
+      width: 100%;
+      max-width: 1300px;
+      margin: 20px auto;
+      padding: 2px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #ffffff;
+    }
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+      font-size: 12px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .pagination {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .pagination button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      margin: 0 5px;
+    }
+    .pagination button:hover {
+      background-color: #45a049;
+    }
+    .container {
+      max-width: 1500px;
+      margin: 0px auto 10px;
+      padding: 3px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 2;
+    }
+    h3 {
+      text-align: left;
+    }
+    .dashboard-section {
+      margin-bottom: 10px;
+    }
+    .dashboard-section h2 {
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    .report-container {
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .logo {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 120px;
+      height: auto;
+      z-index: 2;
+    }
+    .bottom-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .user-info-container {
+      position: absolute;
+      top: 20px;
+      right: 10px;
+      display: flex;
+      align-items: center;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 3;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0,0.4);
+      padding-top: 60px;
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 50px;
+      border: 1px solid #888;
+      width: 100%;
+      max-width: 300px;
+      border-radius: 5px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .field input[type="text"],
+    .field input[type="datetime-local"],
+    .field input[list] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+  <script src="session.js"></script>
+   <iframe src="chatbot.html" width="400" height="500" style="position: fixed; bottom: 0; right: 0; border: none;"></iframe>
+</head>
+<body>
+  <div class="user-info-container">
+    <div class="user-info">
+      <img src="profile.jpg" class="user-avatar" onclick="toggleDropdown()" alt="User">
+      <div class="dropdown-content" id="dropdownContent">
+        <a href="#" onclick="showChangePasswordModal()">Change Password</a>
+        <a href="#">User Settings</a>
+      </div>
+      <span class="user-name" id="userName"></span>
+    </div>
+  </div>
+  <div class="container">
+    <div class="user-info">
+      <h2 id="userFullName"></h2>
+    </div>
+    <img src="logo.jpg" alt="Logo of My Website" class="logo">
+    <h2>El-Roi Transport And logistics</h2>
+    <div class="dashboard-section">
+      <a class="button" href="dashboard.html">Dashboard</a>
+      <a class="button" href="trip.html">Trip</a>
+      <div class="dropdown">
+        <button class="button">Financial Summary</button>
+        <div class="dropdown-content">
+    <a href="monthly.html"><h5>Trip Financial Summary</h5></a>
+    <a href="DriversreportFilter.html"><h5>Drivers Financial Summary</h5></a>
+    <a href="shippersreport.html"><h5>Shippers Financial Summary</h5></a>
+    <a href="vehiclesreport.html"><h5>Vehicles Financial Summary</h5></a>
+</div>
+      </div>
+      <div class="dropdown">
+        <button class="button">Resources</button>
+        <div class="dropdown-content">
+          <a href="Vehicles.html">Vehicles</a>
+          <a href="Drivers.html">Drivers</a>
+          <a href="Shiper.html">Shipper</a>
+          <a href="Agreement.html">Agreement</a>
+        </div>
+      </div>
+      <a class="button" href="#">Help</a>
+    </div>
+  </div>
+  <div class="header">
+    <h2>El-Roi Transport and Logistics Shippers Financial Summary</h2>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="column" id="column1">
+      <div class="header">
+        <h2 onclick="toggleColumn('column1')">Filter</h2>
+      </div>
+      <div class="field">
+        <label for="ShipperName">Shipper Name:</label>
+        <input list="shipperNames" id="ShipperName">
+        <datalist id="shipperNames"></datalist>
+      </div>
+      <div class="field">
+        <button class="button" onclick="filterTrip()">Filter</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-container" id="tripTableContainer">
+    <!-- Table to display trip data will be inserted here -->
+  </div>
+
+  <div class="pagination" id="paginationContainer">
+    <!-- Pagination buttons will be inserted here -->
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+      authDomain: "el-roi-48b9f.firebaseapp.com",
+      databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "el-roi-48b9f",
+      storageBucket: "el-roi-48b9f.appspot.com",
+      messagingSenderId: "402630086025",
+      appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    var database = firebase.database();
+    var currentPage = 1;
+    var selectedShipper = ""; // Initialize selectedShipper globally
+
+    function formatDate(dateString) {
+      var date = new Date(dateString);
+      var formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' });
+      return formattedDate;
+    }
+
+   function displayTrips(page) {
+  console.log("Displaying trips for page", page);
+  var tripTableContainer = document.getElementById("tripTableContainer");
+  var paginationContainer = document.getElementById("paginationContainer");
+  var tripsRef = database.ref('trips');
+
+  tripsRef.once('value', function(snapshot) {
+    console.log("Trips snapshot:", snapshot.val());
+    var trips = snapshot.val();
+    if (trips) {
+      var tableHTML = "<table>";
+      tableHTML += "<tr><th>Trip ID</th><th>Driver Name</th><th>Plate Number</th><th>Pickup Address</th><th>Drop Address</th><th>Loading Date</th><th>Unloading Date</th><th>Cargo Type</th><th>Total Quintal</th><th>Km Covered</th><th>Tariff per Quintal</th><th>Expected Revenue</th><th>Total Cost</th><th>Balance</th><th>Status</th><th colspan='2'>Action</th></tr>";
+
+      var filteredTrips = Object.values(trips).filter(function(trip) {
+        return trip.status.toLowerCase() === "completed" && trip.shipperName === selectedShipper;
+      });
+
+      var totalPages = Math.ceil(filteredTrips.length / 10);
+      var startIndex = (page - 1) * 10;
+      var endIndex = Math.min(startIndex + 10, filteredTrips.length);
+      var paginatedTrips = filteredTrips.slice(startIndex, endIndex);
+
+      // Variables to store grand totals
+      var totalQuintal = 0;
+      var kmCovered = 0;
+      var tariffPerQuintal = 0;
+      var expectedRevenue = 0;
+      var totalCost = 0;
+      var balance = 0;
+
+      paginatedTrips.forEach(function(trip) {
+        tableHTML += "<tr>";
+        tableHTML += "<td>" + trip.tripID + "</td>";
+        tableHTML += "<td>" + trip.driverName + "</td>";
+        tableHTML += "<td>" + trip.plateNumber + "</td>";
+        tableHTML += "<td>" + trip.pickupAddress + "</td>";
+        tableHTML += "<td>" + trip.dropAddress + "</td>";
+        tableHTML += "<td>" + formatDate(trip.loadingDate) + "</td>";
+        tableHTML += "<td>" + formatDate(trip.unloadingDate) + "</td>";
+        tableHTML += "<td>" + trip.cargoType + "</td>";
+        tableHTML += "<td>" + trip.totalQuintal + "</td>";
+        tableHTML += "<td>" + trip.kmCovered + "</td>";
+        tableHTML += "<td>" + trip.tariffPerQuintal + "</td>";
+        tableHTML += "<td>" + trip.expectedRevenue + "</td>";
+        tableHTML += "<td>" + trip.totalCost + "</td>";
+        tableHTML += "<td>" + trip.balance + "</td>";
+        tableHTML += "<td>" + trip.status + "</td>";
+
+        // Accumulate totals
+        totalQuintal += parseFloat(trip.totalQuintal);
+        kmCovered += parseFloat(trip.kmCovered);
+        tariffPerQuintal += parseFloat(trip.tariffPerQuintal);
+        expectedRevenue += parseFloat(trip.expectedRevenue);
+        totalCost += parseFloat(trip.totalCost);
+        balance += parseFloat(trip.balance);
+
+        tableHTML += "<td><button class='button button-note' onclick=\"addNote('" + trip.tripID + "')\">Note</button></td>";
+
+        if (trip.status === "on transit") {
+          tableHTML += "<td><button class='button button-delete' onclick=\"confirmDelete('" + trip.tripID + "')\">Delete</button> <button class='button button-complete' onclick=\"completeTrip('" + trip.tripID + "')\">Complete</button></td>";
+        } else {
+          tableHTML += "<td></td>";
+        }
+        tableHTML += "</tr>";
+      });
+
+      // Append grand total row
+      tableHTML += "<tr>";
+      tableHTML += "<td colspan='8'><strong>Grand Total</strong></td>";
+      tableHTML += "<td><strong>" + totalQuintal.toFixed(2) + "</strong></td>";
+      tableHTML += "<td><strong>" + kmCovered.toFixed(2) + "</strong></td>";
+      tableHTML += "<td><strong>" + (tariffPerQuintal / paginatedTrips.length).toFixed(2) + "</strong></td>";
+      tableHTML += "<td><strong>" + expectedRevenue.toFixed(2) + "</strong></td>";
+      tableHTML += "<td><strong>" + totalCost.toFixed(2) + "</strong></td>";
+      tableHTML += "<td><strong>" + balance.toFixed(2) + "</strong></td>";
+      tableHTML += "<td colspan='3'></td>"; // Empty cells for Action buttons
+      tableHTML += "</tr>";
+
+      tableHTML += "</table>";
+      tripTableContainer.innerHTML = tableHTML;
+
+      var paginationHTML = '';
+      for (var i = 1; i <= totalPages; i++) {
+        paginationHTML += '<button onclick="changePage(' + i + ')">' + i + '</button>';
+      }
+      paginationContainer.innerHTML = paginationHTML;
+    } else {
+      console.log("No trips found in database");
+      tripTableContainer.innerHTML = "<p>No trips found.</p>";
+    }
+  });
+}
+
+
+function filterTrip() {
+  var shipperName = document.getElementById("ShipperName").value;
+  selectedShipper = shipperName;
+  displayTrips(currentPage);
+}
+
+
+    function populateShipperNameDropdown() {
+      var shipperNameDatalist = document.getElementById("shipperNames");
+     var shippersRef = database.ref('shippers');
+      shippersRef.once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var shipperName = childSnapshot.val().shipperName;
+          var option = document.createElement("option");
+          option.value = shipperName;
+          shipperNameDatalist.appendChild(option);
+        });
+      });
+    }
+
+    window.onload = function() {
+      populateShipperNameDropdown(); // Populate shipper name dropdown
+      displayTrips(currentPage); // Display trips on page load
+    };
+  </script>
+</body>
+</html>

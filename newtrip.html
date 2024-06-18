@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trip Detail</title>
+  <style>
+    body {
+      background-image: url('log.jpg');
+      background-size: cover; 
+      background-repeat: no-repeat;
+      background-color: #f0f0f0; 
+      width: 100%;
+      height: 100vh; 
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      background-color: #fff;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .buttons-container {
+      display: flex;
+      align-items: center;
+    }
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .button:last-child {
+      margin-right: 0;
+    }
+    .dashboard-container {
+      max-width: 100%;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: row;
+    }
+    .column {
+      flex: 1;
+      padding: 0 30px;
+    }
+    .field {
+      margin-bottom: 15px;
+    }
+    .field label {
+      display: block;
+      font-weight: bold;
+    }
+    .field input[type="text"],
+    .field input[type="datetime-local"],
+    .field input[list] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .field.loading-unloading-date {
+      text-align: left;
+    }
+  </style>
+  <script src="session.js"></script>
+<iframe src="chatbot.html" width="400" height="500" style="position: fixed; bottom: 0; right: 0; border: none;"></iframe>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Please Insert Trip Detail of each trip</h1>
+      <div class="buttons-container">
+        <!-- No buttons defined in the original code -->
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="column" id="column1">
+      <div class="header">
+        <h1 onclick="toggleColumn('column1')">Trip Details</h1>
+      </div>
+      <div class="field">
+        <label for="tripID">Freight Order (FO):</label>
+        <input type="text" id="tripID" readonly>
+      </div>
+      <div class="field">
+        <label for="DriverName">Driver Name:</label>
+        <input list="driverNames" id="DriverName">
+        <datalist id="driverNames">
+          <!-- Options will be populated dynamically -->
+        </datalist>
+      </div>
+      <div class="field">
+        <label for="PlateNumber">Plate Number:</label>
+        <input list="plateNumbers" id="PlateNumber">
+        <datalist id="plateNumbers">
+          <!-- Options will be populated dynamically -->
+        </datalist>
+      </div>
+      <div class="field">
+        <label for="loadingDate">Loading Date:</label>
+        <input type="datetime-local" id="loadingDate">
+      </div>
+      <div class="field">
+        <label for="unloadingDate">Unloading Date:</label>
+        <input type="datetime-local" id="unloadingDate">
+      </div>
+    </div>
+    <div class="column" id="column2">
+      <div class="header">
+        <h1 onclick="toggleColumn('column2')">Agreement Detail</h1>
+      </div>
+      <div class="field">
+        <label for="ShipperName">Shipper Name:</label>
+        <input list="shipperNames" id="ShipperName">
+        <datalist id="shipperNames">
+          <!-- Options will be populated dynamically -->
+        </datalist>
+      </div>
+      <div class="field">
+        <label for="Agreement">Agreement:</label>
+        <input list="agreements" id="Agreement">
+        <datalist id="agreements">
+          <!-- Options will be populated dynamically -->
+        </datalist>
+      </div>
+      <div class="field">
+          <label for="consigneename">Consignee Name:</label>
+          <input type="text" id="consigneename" readonly>
+        </div>
+        <div class="field">
+          <label for="consigneeadress">Consignee Address:</label>
+          <input type="text" id="consigneeadress" readonly>
+        </div>
+      <div class="field">
+        <label for="pickupAddress">Pick up Address:</label>
+        <input type="text" id="pickupAddress" readonly>
+      </div>
+      <div class="field">
+        <label for="dropAddress">Drop Address:</label>
+        <input type="text" id="dropAddress" readonly>
+      </div>
+      <div class="field">
+        <label for="cargoType">Cargo Type:</label>
+        <input type="text" id="cargoType" readonly>
+      </div>
+      <div class="field">
+        <label for="kmCovered">Km Covered:</label>
+        <input type="text" id="kmCovered" readonly>
+      </div>
+      <div class="field">
+        <label for="totalQuintal">Total Quintal:</label>
+        <input type="text" id="totalQuintal" readonly>
+      </div>
+      <div class="field">
+        <label for="tariffPerQuintal">Tariff per Quintal:</label>
+        <input type="text" id="tariffPerQuintal" readonly>
+      </div>
+      <div class="field">
+        <label for="expectedRevenue">Expected Revenue:</label>
+        <input type="text" id="expectedRevenue" readonly>
+      </div>
+      <div class="field">
+        <button class="button" onclick="startTrip()">Start Trip</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+      authDomain: "el-roi-48b9f.firebaseapp.com",
+      databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "el-roi-48b9f",
+      storageBucket: "el-roi-48b9f.appspot.com",
+      messagingSenderId: "402630086025",
+      appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    var database = firebase.database();
+
+    function populatePlateNumberDropdown() {
+      var plateNumberDatalist = document.getElementById("plateNumbers");
+      var vehiclesRef = database.ref('vehicles');
+      vehiclesRef.once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var plateNumber = childSnapshot.val().plateNumber;
+          var option = document.createElement("option");
+          option.value = plateNumber;
+          plateNumberDatalist.appendChild(option);
+        });
+      });
+    }
+
+    function populateDriverNameDropdown() {
+      var driverNameDatalist = document.getElementById("driverNames");
+      var driversRef = database.ref('drivers');
+      driversRef.once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var driverName = childSnapshot.val().driver_name;
+          var option = document.createElement("option");
+          option.value = driverName;
+          driverNameDatalist.appendChild(option);
+        });
+      });
+    }
+
+    function populateShipperNameDropdown() {
+      var shipperNameDatalist = document.getElementById("shipperNames");
+      var shippersRef = database.ref('shippers');
+      shippersRef.once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var shipperName = childSnapshot.val().shipperName;
+          var option = document.createElement("option");
+          option.value = shipperName;
+          shipperNameDatalist.appendChild(option);
+        });
+      });
+    }
+
+    // Populate the agreement dropdown
+    function populateAgreementDropdown() {
+      var agreementDatalist = document.getElementById("agreements");
+      var agreementsRef = database.ref('agreements');
+      agreementsRef.once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var agreementTitle = childSnapshot.val().agreementTitle;
+          console.log('Agreement Title:', agreementTitle); // Debugging line
+          if (agreementTitle) {
+            var option = document.createElement("option");
+            option.value = agreementTitle;
+            agreementDatalist.appendChild(option);
+          }
+        });
+      });
+    }
+
+    // Add event listener for agreement dropdown change
+    var agreementDropdown = document.getElementById("Agreement");
+    agreementDropdown.addEventListener('change', function() {
+      var selectedAgreement = agreementDropdown.value;
+      fetchAgreementData(selectedAgreement);
+    });
+
+    // Function to fetch agreement data from the database and populate fields
+    function fetchAgreementData(agreementTitle) {
+      const agreementsRef = firebase.database().ref('agreements');
+      agreementsRef.orderByChild('agreementTitle').equalTo(agreementTitle).once('value', function(snapshot) {
+        if (snapshot.exists()) {
+          snapshot.forEach(function(childSnapshot) {
+            const agreementData = childSnapshot.val();
+            console.log("Agreement Data:", agreementData);
+            document.getElementById("consigneename").value = agreementData.consigneename;
+            document.getElementById("consigneeadress").value = agreementData.consigneeadress;
+            document.getElementById("pickupAddress").value = agreementData.pickupAddress;
+            document.getElementById("dropAddress").value = agreementData.dropAddress;
+            document.getElementById("cargoType").value = agreementData.cargoType;
+            document.getElementById("kmCovered").value = agreementData.kmCovered;
+            document.getElementById("totalQuintal").value = agreementData.totalQuintal;
+            document.getElementById("tariffPerQuintal").value = agreementData.tariffPerQuintal;
+            calculateRevenue(); // Calculate revenue after populating fields
+          });
+        } else {
+          console.log("No data found for agreement:", agreementTitle);
+        }
+      });
+    }
+
+    // Call functions to populate dropdowns when the page loads
+    window.onload = function() {
+      populateShipperNameDropdown(); // Populate shipper name dropdown
+      populateAgreementDropdown(); // Populate agreement dropdown
+      populatePlateNumberDropdown(); // Populate plate number dropdown
+      populateDriverNameDropdown(); // Populate driver name dropdown
+
+      // Generate Trip ID
+      generateTripID().then(function(newTripID) {
+        document.getElementById("tripID").value = newTripID;
+      });
+    };
+
+    // Function to toggle visibility of columns
+    function toggleColumn(columnId) {
+      var column = document.getElementById(columnId);
+      // Toggle the visibility of the column
+      if (column.style.display === "none") {
+        column.style.display = "block";
+      } else {
+        column.style.display = "none";
+      }
+    }
+
+    // Function to generate Trip ID starting from "0001"
+    function generateTripID() {
+      var tripRef = database.ref('trips');
+      return tripRef.orderByChild('tripID').limitToLast(1).once('value').then(function(snapshot) {
+        var highestID = 0;
+        snapshot.forEach(function(childSnapshot) {
+          var tripID = parseInt(childSnapshot.val().tripID, 10);
+          if (tripID > highestID) {
+            highestID = tripID;
+          }
+        });
+        var newTripID = highestID + 1;
+        var paddedTripID = newTripID.toString().padStart(5, '0'); // Pad with leading zeros to make it 5 digits
+        return paddedTripID;
+      });
+    }
+
+    function startTrip() {
+      generateTripID().then(function(tripID) {
+        // Get values of trip details
+        var driverName = document.getElementById("DriverName").value.trim();
+        var plateNumber = document.getElementById("PlateNumber").value.trim();
+        var pickupAddress = document.getElementById("pickupAddress").value.trim();
+        var dropAddress = document.getElementById("dropAddress").value.trim();
+        var loadingDate = document.getElementById("loadingDate").value.trim();
+        var unloadingDate = document.getElementById("unloadingDate").value.trim();
+        var cargoType = document.getElementById("cargoType").value.trim();
+        var totalQuintal = document.getElementById("totalQuintal").value.trim();
+        var kmCovered = document.getElementById("kmCovered").value.trim();
+        var tariffPerQuintal = document.getElementById("tariffPerQuintal").value.trim();
+        var expectedRevenue = document.getElementById("expectedRevenue").value.trim(); 
+        var shipperName = document.getElementById("ShipperName").value.trim();
+        var agreementTitle = document.getElementById("Agreement").value.trim();
+        var consigneename = document.getElementById("consigneename").value.trim();
+        var consigneeadress = document.getElementById("consigneeadress").value.trim();
+
+        // Check if any of the fields are empty
+        if (!driverName || !plateNumber || !pickupAddress || !dropAddress || !loadingDate || !unloadingDate || !cargoType || !totalQuintal || !kmCovered || !tariffPerQuintal || !expectedRevenue || !shipperName || !agreementTitle || !consigneename || !consigneeadress) {
+          alert("Please fill out all required fields before starting the trip.");
+          return; // Exit the function if any required field
+        }
+
+        // Convert loading and unloading date strings to Date objects
+        var loadingDateTime = new Date(loadingDate);
+        var unloadingDateTime = new Date(unloadingDate);
+
+        // Check if loading date is after unloading date
+        if (loadingDateTime > unloadingDateTime) {
+          alert("Loading date cannot be after unloading date.");
+          return;
+        }
+
+        // Save the trip details to the database under "trips" node with trip ID as key
+        database.ref('trips/' + tripID).set({
+          tripID: tripID,
+          driverName: driverName,
+          plateNumber: plateNumber,
+          pickupAddress: pickupAddress,
+          dropAddress: dropAddress,
+          loadingDate: loadingDate,
+          unloadingDate: unloadingDate,
+          cargoType: cargoType,
+          totalQuintal: totalQuintal,
+          kmCovered: kmCovered,
+          tariffPerQuintal: tariffPerQuintal,
+          expectedRevenue: expectedRevenue,
+          shipperName: shipperName,
+          agreementTitle: agreementTitle,
+          consigneename: consigneename,
+          consigneeadress: consigneeadress,
+          status: "on transit" // Add the status field and set it to "on transit"
+        }).then(() => {
+          // Trip saved successfully
+          alert("Trip started and details saved successfully!");
+          // Clear input fields
+          document.getElementById("DriverName").value = "";
+          document.getElementById("PlateNumber").value = "";
+          document.getElementById("pickupAddress").value = "";
+          document.getElementById("dropAddress").value = "";
+          document.getElementById("loadingDate").value = "";
+          document.getElementById("unloadingDate").value = "";
+          document.getElementById("cargoType").value = "";
+          document.getElementById("totalQuintal").value = "";
+          document.getElementById("kmCovered").value = "";
+          document.getElementById("tariffPerQuintal").value = "";
+          document.getElementById("expectedRevenue").value = "";
+          document.getElementById("ShipperName").value = "";
+          document.getElementById("Agreement").value = "";
+          window.history.back();
+        }).catch((error) => {
+          // Handle any errors
+          console.error("Error starting trip:", error);
+        });
+      });
+    }
+
+    function calculateRevenue() {
+      var totalQuintal = parseFloat(document.getElementById("totalQuintal").value.trim());
+      var tariffPerQuintal = parseFloat(document.getElementById("tariffPerQuintal").value.trim());
+
+      // Check if both totalQuintal and tariffPerQuintal are valid numbers
+      if (!isNaN(totalQuintal) && !isNaN(tariffPerQuintal)) {
+        var expectedRevenue = totalQuintal * tariffPerQuintal;
+        document.getElementById("expectedRevenue").value = expectedRevenue.toFixed(2);
+      } else {
+        // Clear expected revenue if either input is invalid
+        document.getElementById("expectedRevenue").value = "";
+      }
+    }
+  </script>
+</body>
+</html>

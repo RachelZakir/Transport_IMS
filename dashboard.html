@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    /* Your existing CSS styles */
+    body {
+      background-image: url('log.jpg');
+      background-size: cover; 
+      background-position: top right; /* Adjust background position */
+      background-repeat: no-repeat;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      position: relative; /* Add position relative to body */
+    }
+    .container {
+      max-width: 1500px;
+      margin: 0px auto 10px; /* Adjust margin to push container down */
+      padding: 5px;
+      background-color: rgba(255, 255, 255, 0.9); /* Add opacity to container background */
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      position: top; /* Add position relative to allow z-index */
+      z-index: 2; /* Ensure container is above background image */
+    }
+    h1 {
+      text-align: left;
+    }
+    .dashboard-section {
+      margin-bottom: 10px;
+    }
+    .dashboard-section h2 {
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    .report-container {
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .button {
+      display: inline-block;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 10px; /* Add margin between buttons */
+    }
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    .logo {
+      position: absolute;
+      top: 0px; /* Adjust as needed */
+      right: 10px; /* Adjust as needed */
+      z-index: 2; /* Ensure logo is above container */
+    }
+    .bottom-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .user-info-container {
+      position: absolute;
+      top: 20px; /* Adjust top position */
+      right: 10px; /* Adjust right position */
+      display: flex;
+      align-items: center;
+    }
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+      margin-right: 10px; /* Add space between avatar and name */
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 3;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0,0.4);
+      padding-top: 60px;
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 10% auto;
+      padding: 50px;
+      border: 1px solid #888;
+      width: 100%;
+      max-width: 300px;
+      border-radius: 5px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+  <script src="session.js"></script>
+  <iframe src="chatbot.html" width="400" height="500" style="position: fixed; bottom: 0; right: 0; border: none;"></iframe>
+</head>
+<body>
+  <div class="container">
+    <!-- Your existing container content -->
+  </div>
+  <div class="user-info-container">
+    <div class="user-info">
+      <img src="profile.jpg" class="user-avatar" onclick="toggleDropdown()" alt="User">
+      <div class="dropdown-content" id="dropdownContent">
+        <a href="#" onclick="showChangePasswordModal()">Change Password</a>
+        <a href="#">User Settings</a>
+      </div>
+      <span class="user-name" id="userName"></span>
+    </div>
+  </div>
+  <div class="container">
+    <div class="user-info">
+      <h2 id="userFullName"></h2> <!-- Replace "User Name" with actual user name -->
+    </div>
+    <img src="logo.jpg" alt="Logo of My Website" class="logo">
+    <h1>Kerchanshe Transport And logistics Dashboard</h1>
+    <!-- Buttons Section -->
+    <div class="dashboard-section">
+       <a class="button" href="dashboard.html">Dashboard</a>
+      <a class="button" href="trip.html">Trip</a> <!-- Add href attribute pointing to trip.html -->
+      <div class="dropdown">
+        <button class="button">Financial Summary</button>
+        <div class="dropdown-content">
+    <a href="monthly.html"><h5>Trip Financial Summary</h5></a>
+    <a href="DriversreportFilter.html"><h5>Drivers Financial Summary</h5></a>
+    <a href="shippersreport.html"><h5>Shippers Financial Summary</h5></a>
+    <a href="vehiclesreport.html"><h5>Vehicles Financial Summary</h5></a>
+</div>
+      </div>
+      <div class="dropdown">
+        <button class="button">Resources</button>
+        <div class="dropdown-content">
+          <a href="Vehicles.html">Vehicles</a>
+          <a href="Drivers.html">Drivers</a>
+          <a href="Shiper.html">Shipper</a> <!-- Add href attribute pointing to Drivers.html -->
+          <a href="Agreement.html">Agreement</a>
+          <a href="assist.html">Assist Drivers</a>
+        </div>
+      </div>
+     <div class="dropdown">
+        <button class="button">Payment requisition</button>
+        <div class="dropdown-content">
+    <a href="Payment_requisition.html"><h5>Rayment requisition</h5></a>
+    <a href="monthly.html"><h5>Payment requisition Summary</h5></a>
+    <a href="DriversreportFilter.html"><h5>Drivers payment requisition Summary</h5></a>
+    <a href="shippersreport.html"><h5>Ass.Driver payment requisition Summary</h5></a>
+       </div>
+     </div>
+      <a class="button" href="#">Help</a>
+    </div>
+  </div>
+  <!-- Bottom Container -->
+  <div class="bottom-container">
+    <div class="dashboard-section">
+      <h2>Date and Time</h2>
+      <div id="dateTime"></div>
+    </div>
+    <div class="dashboard-section">
+      <h2>  </h2>
+      <div id="greeting"></div>
+    </div>
+  </div>
+  <!-- Password Change Modal -->
+  <div id="passwordChangeModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeChangePasswordModal()">&times;</span>
+      <h2>Change Password</h2>
+      <form id="passwordChangeForm" onsubmit="return changePassword()">
+        <label for="oldPassword">Old Password:</label>
+        <input type="password" id="oldPassword" required>
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword" required>
+        <label for="confirmNewPassword">Confirm New Password:</label>
+        <input type="password" id="confirmNewPassword" required>
+        <button type="submit" class="button">Change Password</button>
+      </form>
+    </div>
+  </div>
+  <script>
+    // Toggle Dropdown
+    function toggleDropdown() {
+      var dropdownContent = document.getElementById("dropdownContent");
+      if (dropdownContent.style.display === "block") {
+        dropdownContent.style.display = "none";
+      } else {
+        dropdownContent.style.display = "block";
+      }
+    }
+
+    // Close the dropdown if the user clicks outside of it
+    window.onclick = function(event) {
+      if (!event.target.matches('.user-avatar')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        for (var i = 0; i < dropdowns.length; i++) {
+          var openDropdown = dropdowns[i];
+          if (openDropdown.style.display === "block") {
+            openDropdown.style.display = "none";
+          }
+        }
+      }
+    }
+
+    // Show Change Password Modal
+    function showChangePasswordModal() {
+      document.getElementById("passwordChangeModal").style.display = "block";
+    }
+
+    // Close Change Password Modal
+    function closeChangePasswordModal() {
+      document.getElementById("passwordChangeModal").style.display = "none";
+    }
+
+    // Change Password
+    function changePassword() {
+      var oldPassword = document.getElementById("oldPassword").value;
+      var newPassword = document.getElementById("newPassword").value;
+      var confirmNewPassword = document.getElementById("confirmNewPassword").value;
+
+      // Retrieve user info from localStorage
+      var loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+      if (loggedInUser) {
+        if (oldPassword !== loggedInUser.password) {
+          alert("Old password is incorrect.");
+          return false;
+        }
+        if (newPassword !== confirmNewPassword) {
+          alert("New passwords do not match.");
+          return false;
+        }
+
+        // Update password in localStorage (Simulating database update)
+        loggedInUser.password = newPassword;
+        localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+        alert("Password changed successfully.");
+
+        // Close modal
+        closeChangePasswordModal();
+        return false;
+      }
+    }
+
+    // Date and Time Calendar
+    function displayDateTime() {
+      var now = new Date();
+      var dateTime = now.toLocaleString();
+      document.getElementById("dateTime").innerHTML = dateTime;
+    }
+
+    // Greeting Text
+    function displayGreeting() {
+      var now = new Date();
+      var hour = now.getHours();
+      var greeting;
+      if (hour < 12) {
+        greeting = "Good morning";
+      } else if (hour < 18) {
+        greeting = "Good afternoon";
+      } else {
+        greeting = "Good evening";
+      }
+
+      // Retrieve user info from localStorage
+      var loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+      if (loggedInUser) {
+        var userName = loggedInUser.fullName;
+        document.getElementById("userFullName").innerText = userName;
+        document.getElementById("userName").innerText = userName;
+        document.getElementById("greeting").innerHTML = greeting + ", " + userName + "!";
+      }
+    }
+
+    // Call functions to display date and time calendar and greeting text
+    displayDateTime();
+    displayGreeting();
+    // Update date and time every second
+    setInterval(displayDateTime, 1000);
+  </script>
+</body>
+</html>

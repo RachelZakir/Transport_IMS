@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shipper</title>
+  <style>
+     body {
+  background-image: url('log.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: #f0f0f0;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  background-color: #ffffff;
+  padding: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.buttons-container {
+  display: flex;
+  align-items: center;
+}
+
+.button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.button-delete {
+  background-color: lightcoral; /* Light red color */
+  color: white;
+}
+
+.button-edit {
+  background-color: lightblue; /* Light blue color */
+  color: white;
+}
+
+.button:last-child {
+  margin-right: 0;
+}
+
+.dashboard-container {
+  width: 100%;
+  max-width: 1300px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #ffffff;
+}
+
+th, td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+  font-size: 12px; /* Smaller font size for table data */
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pagination button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  margin: 0 5px;
+}
+
+.pagination button:hover {
+  background-color: #45a049;
+}
+
+.container {
+  max-width: 1500px;
+  margin: 0px auto 10px; /* Adjust margin to push container down */
+  padding: 3px;
+  background-color: rgba(255, 255, 255, 0.9); /* Add opacity to container background */
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  position: relative; /* Ensure container is positioned relative */
+  z-index: 2; /* Ensure container is above background image */
+}
+
+h3 {
+  text-align: left;
+}
+
+.dashboard-section {
+  margin-bottom: 10px;
+}
+
+.dashboard-section h2 {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
+.report-container {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.logo {
+  position: absolute;
+  top: 10px; /* Adjust as needed */
+  right: 10px; /* Adjust as needed */
+  width: 120px; /* Smaller width */
+  height: auto; /* Maintain aspect ratio */
+  z-index: 2; /* Ensure logo is above container */
+}
+
+.bottom-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.user-info-container {
+  position: absolute;
+  top: 20px; /* Adjust top position */
+  right: 10px; /* Adjust right position */
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+  margin-right: 10px; /* Add space between avatar and name */
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 3;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.4);
+  padding-top: 60px;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 10% auto;
+  padding: 50px;
+  border: 1px solid #888;
+  width: 100%;
+  max-width: 300px;
+  border-radius: 5px;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+    #toggleChat {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 16px;
+      cursor: pointer;
+      outline: none;
+      z-index: 1000; /* Ensure the toggle button is on top */
+    }
+
+    #toggleChat:hover {
+      background-color: #0056b3;
+    }
+
+    #dialogflowChatWrapper {
+      display: none;
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 400px; /* Match this width to the width of the iframe in the parent */
+      height: 500px; /* Match this height to the height of the iframe in the parent */
+      z-index: 1000; /* Ensure the wrapper is on top */
+    }
+
+    #dialogflowChat {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+  </style>
+  <script src="session.js"></script>
+</head>
+<body>
+   <!-- Toggle button for Dialogflow chat interface -->
+  <button id="toggleChat">Need Help?</button>
+
+  <!-- Dialogflow iframe wrapped in a div -->
+  <div id="dialogflowChatWrapper">
+    <iframe
+      id="dialogflowChat"
+      allow="microphone;"
+      src="https://console.dialogflow.com/api-client/demo/embedded/6b1176b0-16c8-4ffb-9e37-495f47d7ee58">
+    </iframe>
+  </div>
+  <div class="user-info-container">
+    <div class="user-info">
+      <img src="profile.jpg" class="user-avatar" onclick="toggleDropdown()" alt="User">
+      <div class="dropdown-content" id="dropdownContent">
+        <a href="#" onclick="showChangePasswordModal()">Change Password</a>
+        <a href="#">User Settings</a>
+      </div>
+      <span class="user-name" id="userName"></span>
+    </div>
+  </div>
+  <div class="container">
+    <div class="user-info">
+      <h2 id="userFullName"></h2> <!-- Replace "User Name" with actual user name -->
+    </div>
+    <img src="logo.jpg" alt="Logo of My Website" class="logo">
+    <h2>Kerchanshe Transport And logistics</h2>
+    <!-- Buttons Section -->
+    <div class="dashboard-section">
+       <a class="button" href="dashboard.html">Dashboard</a>
+      <a class="button" href="trip.html">Trip</a> <!-- Add href attribute pointing to trip.html -->
+      <div class="dropdown">
+        <button class="button">Financial Summary</button>
+        <div class="dropdown-content">
+    <a href="monthly.html"><h5>Trip Financial Summary</h5></a>
+    <a href="DriversreportFilter.html"><h5>Drivers Financial Summary</h5></a>
+    <a href="shippersreport.html"><h5>Shippers Financial Summary</h5></a>
+    <a href="vehiclesreport.html"><h5>Vehicles Financial Summary</h5></a>
+</div>
+      </div>
+      <div class="dropdown">
+        <button class="button">Resources</button>
+        <div class="dropdown-content">
+          <a href="Vehicles.html">Vehicles</a>
+          <a href="Drivers.html">Drivers</a>
+          <a href="Shiper.html">Shipper</a> <!-- Add href attribute pointing to Drivers.html -->
+          <a href="Agreement.html">Agreement</a>
+          <a href="assist.html">Assist Drivers</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="button">Payment requisition</button>
+        <div class="dropdown-content">
+    <a href="Payment_requisition.html"><h5>Rayment requisition</h5></a>
+    <a href="monthly.html"><h5>Payment requisition Summary</h5></a>
+    <a href="DriversreportFilter.html"><h5>Drivers payment requisition Summary</h5></a>
+    <a href="shippersreport.html"><h5>Ass.Driver payment requisition Summary</h5></a>
+       </div>
+     </div>
+     
+      <a class="button" href="#">Help</a>
+    </div>
+  </div>
+  <!-- Bottom Container -->
+  <!-- Password Change Modal -->
+  <div id="passwordChangeModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeChangePasswordModal()">&times;</span>
+      <h2>Change Password</h2>
+      <form id="passwordChangeForm" onsubmit="return changePassword()">
+        <label for="oldPassword">Old Password:</label>
+        <input type="password" id="oldPassword" required>
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword" required>
+        <label for="confirmNewPassword">Confirm New Password:</label>
+        <input type="password" id="confirmNewPassword" required>
+        <button type="submit" class="button">Change Password</button>
+      </form>
+    </div>
+  </div>
+  <div class="header">
+    <h1>Shippers</h1>
+    <div class="buttons-container">
+      <a href="newShiper.html" class="button" id="newShipperButton">Add New Shipper</a>
+    </div>
+  </div>
+  <div class="dashboard-container" id="shippersTableContainer"></div>
+  <div class="pagination" id="pagination"></div>
+  
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+  <script>
+    // Initialize Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+      authDomain: "el-roi-48b9f.firebaseapp.com",
+      databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "el-roi-48b9f",
+      storageBucket: "el-roi-48b9f.appspot.com",
+      messagingSenderId: "402630086025",
+      appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+    };
+firebase.initializeApp(firebaseConfig);
+
+    var database = firebase.database();
+    var shippersPerPage = 10;
+    var currentPage = 1;
+
+    function deleteShipper(shipperName) {
+      var shipperRef = database.ref('shippers/' + shipperName);
+      shipperRef.remove()
+        .then(function() {
+          console.log("Shipper deleted successfully!");
+          displayShippers(currentPage);
+        })
+        .catch(function(error) {
+          console.error("Error deleting shipper: ", error);
+        });
+    }
+
+    function confirmDelete(shipperName) {
+      var confirmDelete = confirm("Are you sure you want to delete this Shipper?");
+      if (confirmDelete) {
+        deleteShipper(shipperName);
+      }
+    }
+
+
+    function displayShippers(page) {
+      var shippersRef = database.ref('shippers');
+      shippersRef.once('value', function(snapshot) {
+        var shippers = snapshot.val();
+        if (shippers) {
+          var shipperList = [];
+          for (var key in shippers) {
+            if (shippers.hasOwnProperty(key)) {
+              shipperList.push({ id: key, ...shippers[key] });
+            }
+          }
+          renderTable(shipperList, page);
+          renderPagination(shipperList.length);
+        } else {
+          document.getElementById('shippersTableContainer').innerHTML = "<p>No shippers found.</p>";
+        }
+      });
+    }
+
+  function renderTable(shippers, page) {
+  var start = (page - 1) * shippersPerPage;
+  var end = start + shippersPerPage;
+  var paginatedShippers = shippers.slice(start, end);
+  var tableHTML = "<table>";
+  tableHTML += "<tr><th>Shipper Name</th><th>Address</th><th>Phone Number</th><th>Email</th><th>Actions</th></tr>";
+
+  paginatedShippers.forEach(function(shipper) {
+    tableHTML += "<tr>";
+    tableHTML += "<td>" + shipper.shipperName + "</td>";
+    tableHTML += "<td>" + shipper.address + "</td>";
+    tableHTML += "<td>" + shipper.phoneNumber + "</td>";
+    tableHTML += "<td>" + shipper.email + "</td>";
+    tableHTML += "<td><button class='button button-edit' onclick=\"editShipper('" + shipper.shipperName + "')\">Edit</button> ";
+    tableHTML += "<button class='button button-delete' onclick=\"confirmDelete('" + shipper.shipperName + "')\">Delete</button></td>";
+    tableHTML += "</tr>";
+  });
+
+  tableHTML += "</table>";
+  document.getElementById('shippersTableContainer').innerHTML = tableHTML;
+}
+
+
+    function renderPagination(totalShippers) {
+      var totalPages = Math.ceil(totalShippers / shippersPerPage);
+      var paginationHTML = '';
+
+      for (var i = 1; i <= totalPages; i++) {
+        paginationHTML += '<button onclick="displayShippers(' + i + ')">' + i + '</button>';
+      }
+
+      document.getElementById('pagination').innerHTML = paginationHTML;
+    }
+
+    function editShipper(shipperName) {
+      window.location.href = 'editshiper.html?shipperName=' + shipperName;
+    }
+
+    window.onload = function() {
+      displayShippers(currentPage);
+    };
+     document.getElementById("toggleChat").addEventListener("click", function() {
+      var chatWrapper = document.getElementById("dialogflowChatWrapper");
+      if (chatWrapper.style.display === "none" || chatWrapper.style.display === "") {
+        chatWrapper.style.display = "block";
+      } else {
+        chatWrapper.style.display = "none";
+      }
+    });
+
+    // Listen for messages from the parent page
+    window.addEventListener("message", function(event) {
+      if (event.data === "toggleChat") {
+        var chatWrapper = document.getElementById("dialogflowChatWrapper");
+        if (chatWrapper.style.display === "none" || chatWrapper.style.display === "") {
+          chatWrapper.style.display = "block";
+        } else {
+          chatWrapper.style.display = "none";
+        }
+      }
+    }, false);
+  </script>
+</body>
+</html>

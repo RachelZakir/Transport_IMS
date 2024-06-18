@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trip Cost</title>
+  <style>
+    body {
+      background-image: url('log.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-color: #f0f0f0;
+      width: 100%;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #ffffff;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      margin: 0;
+    }
+
+    .buttons-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .button:last-child {
+      margin-right: 0;
+    }
+
+    .dashboard-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      backdrop-filter: blur(5px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: bold;
+    }
+
+    .field input[type="text"],
+    .field select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+  <script src="session.js"></script>
+   <iframe src="chatbot.html" width="400" height="500" style="position: fixed; bottom: 0; right: 0; border: none;"></iframe>
+</head>
+<body>
+  <div class="header">
+    <h1>Please Insert Trip Cost Detail</h1>
+    <div class="buttons-container"></div>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="field">
+      <label for="driversAllowance">Driver's Allowance:</label>
+      <input type="text" id="driversAllowance" onchange="calculateTotalCost()" required>
+    </div>
+    <div class="field">
+      <label for="assistantDriverAllowance">Ass. Driver Allowance:</label>
+      <input type="text" id="assistantDriverAllowance" onchange="calculateTotalCost()" required>
+    </div>
+    <div class="field">
+      <label for="loadingUnloading">Loading and Unloading:</label>
+      <input type="text" id="loadingUnloading" onchange="calculateTotalCost()" required>
+    </div>
+    <div class="field">
+      <label for="parking">Parking:</label>
+      <input type="text" id="parking" onchange="calculateTotalCost()" required>
+    </div>
+    <div class="field">
+      <label for="fuelCost">Fuel Cost:</label>
+      <input type="text" id="fuelCost" onchange="calculateTotalCost()" required>
+    </div>
+    <div class="field">
+      <label for="fuelLiter">Fuel Liter:</label>
+      <input type="text" id="fuelLiter" onchange="calculateTotalCost()" required>
+    </div>
+    <div class="field">
+      <label for="tireMaintenance">Tire Maintenance:</label>
+      <input type="text" id="tireMaintenance" onchange="calculateTotalCost()" required>
+    </div>
+    <div class="field">
+      <label for="washing">Washing:</label>
+      <input type="text" id="washing" onchange="calculateTotalCost()" required>
+    </div>
+    <div class="field">
+      <label for="Others">Others:</label>
+      <input type="text" id="Others" onchange="calculateTotalCost()" required>
+    </div>
+    <div class="field">
+      <label for="totalCost">Total Cost:</label>
+      <input type="text" id="totalCost" readonly>
+    </div>
+    <div class="field">
+      <label for="expectedRevenue">Expected Revenue:</label>
+      <input type="text" id="expectedRevenue" readonly>
+    </div>
+    <div class="field">
+      <label for="balance">Balance:</label>
+      <input type="text" id="balance" readonly>
+    </div>
+    <div class="field">
+      <button class="button" onclick="completeTrip()">Complete Trip</button>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+  <script>
+    var firebaseConfig = {
+     apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
+      authDomain: "el-roi-48b9f.firebaseapp.com",
+      databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "el-roi-48b9f",
+      storageBucket: "el-roi-48b9f.appspot.com",
+      messagingSenderId: "402630086025",
+      appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+    };
+
+   firebase.initializeApp(firebaseConfig);
+
+    var database = firebase.database();
+
+    function isValidNumber(value) {
+      return !isNaN(parseFloat(value)) && isFinite(value);
+    }
+
+    function calculateTotalCost() {
+      var driversAllowance = parseFloat(document.getElementById("driversAllowance").value.trim()) || 0;
+      var assistantDriverAllowance = parseFloat(document.getElementById("assistantDriverAllowance").value.trim()) || 0;
+      var loadingUnloading = parseFloat(document.getElementById("loadingUnloading").value.trim()) || 0;
+      var parking = parseFloat(document.getElementById("parking").value.trim()) || 0;
+      var fuelCost = parseFloat(document.getElementById("fuelCost").value.trim()) || 0;
+      var fuelLiter = parseFloat(document.getElementById("fuelLiter").value.trim()) || 0;
+      var tireMaintenance = parseFloat(document.getElementById("tireMaintenance").value.trim()) || 0;
+      var washing = parseFloat(document.getElementById("washing").value.trim()) || 0;
+      var others = parseFloat(document.getElementById("Others").value.trim()) || 0;
+      var totalCost = driversAllowance + assistantDriverAllowance + loadingUnloading + parking + fuelCost + tireMaintenance + washing + others;
+      document.getElementById("totalCost").value = totalCost.toFixed(2);
+      calculateBalance();
+    }
+
+    function retrieveExpectedRevenue(tripId) {
+      var tripsRef = database.ref('trips').orderByChild('tripID').equalTo(tripId);
+      tripsRef.once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var data = childSnapshot.val();
+          document.getElementById("expectedRevenue").value = data.expectedRevenue;
+          calculateBalance();
+        });
+      });
+    }
+
+    window.onload = function() {
+      var tripId = getTripIdFromUrl();
+      if (tripId) {
+        retrieveExpectedRevenue(tripId);
+      }
+    };
+
+    function calculateBalance() {
+      var expectedRevenue = parseFloat(document.getElementById("expectedRevenue").value.trim()) || 0;
+      var totalCost = parseFloat(document.getElementById("totalCost").value.trim()) || 0;
+      var balance = expectedRevenue - totalCost;
+      document.getElementById("balance").value = balance.toFixed(2);
+    }
+
+    function getTripIdFromUrl() {
+      var urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('tripId');
+    }
+
+    function completeTrip() {
+      var tripId = getTripIdFromUrl();
+
+      if (!tripId) {
+        alert("Invalid trip ID. Please provide a valid trip ID.");
+        return;
+      }
+
+      var fields = ["driversAllowance", "assistantDriverAllowance", "loadingUnloading", "parking", "fuelCost", "fuelLiter", "tireMaintenance", "washing", "Others"];
+      var values = {};
+      var valid = true;
+
+      fields.forEach(function(field) {
+        var value = document.getElementById(field).value.trim();
+        if (!isValidNumber(value)) {
+          valid = false;
+          document.getElementById(field).style.borderColor = "red";
+        } else {
+          document.getElementById(field).style.borderColor = "";
+          values[field] = parseFloat(value);
+        }
+      });
+
+      if (!valid) {
+        alert("Please fill out all fields with valid numeric values.");
+        return;
+      }
+
+      var totalCost = values.driversAllowance + values.assistantDriverAllowance + values.loadingUnloading + values.parking + values.fuelCost + values.tireMaintenance + values.washing + values.Others;
+      var expectedRevenue = parseFloat(document.getElementById("expectedRevenue").value.trim()) || 0;
+      var balance = expectedRevenue - totalCost;
+
+      if (balance <= 0) {
+        alert("Cannot complete trip. Balance must be positive.");
+        return;
+      }
+
+      var tripRef = database.ref('trips/' + tripId);
+      tripRef.update({
+        status: 'completed',
+        totalCost: totalCost,
+        expectedRevenue: expectedRevenue,
+        balance: balance
+      }, function(error) {
+        if (error) {
+          console.log("Error updating trip details:", error.message);
+          alert("Error updating trip details. Please try again.");
+        } else {
+          console.log("Trip details updated successfully.");
+          alert("Trip completed successfully!");
+         window.location.href = 'trip.html';
+
+        }
+      });
+    }
+  </script>
+</body>
+</html>
