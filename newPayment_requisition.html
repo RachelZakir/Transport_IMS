@@ -190,13 +190,13 @@
 
   <script>
     var firebaseConfig = {
-      apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
-      authDomain: "el-roi-48b9f.firebaseapp.com",
-      databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "el-roi-48b9f",
-      storageBucket: "el-roi-48b9f.appspot.com",
-      messagingSenderId: "402630086025",
-      appId: "1:402630086025:web:bf4aa55859c40f6487a558"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -215,14 +215,13 @@
       });
     }
 
-    function populatetripData(tripID) {
+    function populateTripData(tripID) {
       var tripRef = database.ref('trips/' + tripID);
 
       tripRef.once('value').then(function(snapshot) {
         var tripData = snapshot.val();
 
         if (tripData) {
-          document.getElementById("Payment_requisitionID").value = tripData.Payment_requisitionID || "";
           document.getElementById("DriverName").value = tripData.driverName || "";
           document.getElementById("PlateNumber").value = tripData.plateNumber || "";
           document.getElementById("pickupAddress").value = tripData.pickupAddress || "";
@@ -232,8 +231,21 @@
           document.getElementById("totalQuintal").value = tripData.totalQuintal || "";
           document.getElementById("tariffPerQuintal").value = tripData.tariffPerQuintal || "";
           document.getElementById("expectedRevenue").value = tripData.expectedRevenue || "";
-          document.getElementById("tripID").value = tripData.tripID || "";
+          document.getElementById("tripID").value = tripID || "";
         }
+      });
+    }
+
+    function generatePaymentRequisitionID() {
+      var paymentReqRef = database.ref('payment_requisitions');
+      paymentReqRef.limitToLast(1).once('value', function(snapshot) {
+        var lastPaymentRequisitionID = 0;
+        snapshot.forEach(function(childSnapshot) {
+          lastPaymentRequisitionID = parseInt(childSnapshot.key, 10);
+        });
+
+        var newPaymentRequisitionID = lastPaymentRequisitionID + 1;
+        document.getElementById("Payment_requisitionID").value = newPaymentRequisitionID;
       });
     }
 
@@ -316,9 +328,10 @@
       var urlParams = new URLSearchParams(window.location.search);
       var tripID = urlParams.get('tripID');
       if (tripID) {
-        populatetripData(tripID);
+        populateTripData(tripID);
       }
       populateAssistDriverNameDropdown();
+      generatePaymentRequisitionID();
     }
   </script>
 </body>
