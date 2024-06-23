@@ -339,20 +339,22 @@ firebase.initializeApp(firebaseConfig);
 
     // Function to generate a new Payment Requisition ID
     function generatePaymentRequisitionID() {
-      var paymentReqRef = database.ref('payment_requisitions');
-      paymentReqRef.limitToLast(1).once('value', function(snapshot) {
-        var lastPaymentRequisitionID = 0;
-        snapshot.forEach(function(childSnapshot) {
-          lastPaymentRequisitionID = parseInt(childSnapshot.key, 10);
-        });
+  var paymentReqRef = database.ref('payment_requisitions');
+  paymentReqRef.limitToLast(1).once('value', function(snapshot) {
+    var lastPaymentRequisitionID = 0;
+    snapshot.forEach(function(childSnapshot) {
+      lastPaymentRequisitionID = parseInt(childSnapshot.key, 10);
+    });
 
-        var newPaymentRequisitionID = lastPaymentRequisitionID + 1;
-        console.log("New Payment Requisition ID: ", newPaymentRequisitionID); // Debugging
-        document.getElementById("Payment_requisitionID").value = newPaymentRequisitionID;
-      }).catch(function(error) {
-        console.error("Error generating payment requisition ID: ", error); // Debugging
-      });
-    }
+    // Increment the last ID and format it as a four-digit string with leading zeros
+    var newPaymentRequisitionID = (lastPaymentRequisitionID + 1).toString().padStart(4, '0');
+    console.log("New Payment Requisition ID: ", newPaymentRequisitionID); // Debugging
+    document.getElementById("Payment_requisitionID").value = newPaymentRequisitionID;
+  }).catch(function(error) {
+    console.error("Error generating payment requisition ID: ", error); // Debugging
+  });
+}
+
   </script>
 </body>
 </html>
