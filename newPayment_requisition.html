@@ -238,7 +238,7 @@
 
     function generatePaymentRequisitionID() {
       var paymentReqRef = database.ref('payment_requisitions');
-      paymentReqRef.limitToLast(1).once('value', function(snapshot) {
+      paymentReqRef.limitToLast(0001).once('value', function(snapshot) {
         var lastPaymentRequisitionID = 0;
         snapshot.forEach(function(childSnapshot) {
           lastPaymentRequisitionID = parseInt(childSnapshot.key, 10);
