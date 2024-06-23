@@ -201,30 +201,16 @@
 firebase.initializeApp(firebaseConfig);
     var database = firebase.database();
 
-    function populateAssistDriverNameDropdown() {
-      var assistDriverDatalist = document.getElementById("assistDrivers");
-      var assistDriversRef = database.ref('assist_drivers');
-      assistDriversRef.once('value', function(snapshot) {
-        snapshot.forEach(function(childSnapshot) {
-          var assistDriverName = childSnapshot.val().assist_driver_name;
-          console.log("Assist Driver Name: ", assistDriverName);  // Debugging
-          var option = document.createElement("option");
-          option.value = assistDriverName;
-          assistDriverDatalist.appendChild(option);
-        });
-      }).catch(function(error) {
-        console.error("Error fetching assist drivers: ", error);  // Debugging
-      });
-    }
-
+    // Function to populate trip data based on tripID
     function populateTripData(tripID) {
       var tripRef = database.ref('trips/' + tripID);
 
       tripRef.once('value').then(function(snapshot) {
         var tripData = snapshot.val();
-        console.log("Trip Data: ", tripData);  // Debugging
+        console.log("Trip Data: ", tripData); // Debugging
 
         if (tripData) {
+          // Populate fields with trip data
           document.getElementById("DriverName").value = tripData.driverName || "";
           document.getElementById("PlateNumber").value = tripData.plateNumber || "";
           document.getElementById("pickupAddress").value = tripData.pickupAddress || "";
@@ -237,26 +223,11 @@ firebase.initializeApp(firebaseConfig);
           document.getElementById("tripID").value = tripID || "";
         }
       }).catch(function(error) {
-        console.error("Error fetching trip data: ", error);  // Debugging
+        console.error("Error fetching trip data: ", error); // Debugging
       });
     }
 
-    function generatePaymentRequisitionID() {
-      var paymentReqRef = database.ref('payment_requisitions');
-      paymentReqRef.limitToLast(1).once('value', function(snapshot) {
-        var lastPaymentRequisitionID = 0;
-        snapshot.forEach(function(childSnapshot) {
-          lastPaymentRequisitionID = parseInt(childSnapshot.key, 10);
-        });
-
-        var newPaymentRequisitionID = lastPaymentRequisitionID + 1;
-        console.log("New Payment Requisition ID: ", newPaymentRequisitionID);  // Debugging
-        document.getElementById("Payment_requisitionID").value = newPaymentRequisitionID;
-      }).catch(function(error) {
-        console.error("Error generating payment requisition ID: ", error);  // Debugging
-      });
-    }
-
+    // Function to calculate assistant's advance payment
     function calculateAssistantAllowance() {
       var tripStartDate = document.getElementById("tripStartDate").value;
       var tripEndDate = document.getElementById("tripEndDate").value;
@@ -276,6 +247,7 @@ firebase.initializeApp(firebaseConfig);
       }
     }
 
+    // Function to submit payment requisition
     function askPayment() {
       var Payment_requisitionID = document.getElementById("Payment_requisitionID").value;
       var tripID = document.getElementById("tripID").value;
@@ -317,8 +289,9 @@ firebase.initializeApp(firebaseConfig);
         AssadvancePayment: AssadvancePayment
       };
 
-      console.log("Payment Requisition Data: ", paymentRequisitionData);  // Debugging
+      console.log("Payment Requisition Data: ", paymentRequisitionData); // Debugging
 
+      // Save payment requisition data to Firebase
       database.ref('payment_requisitions/' + Payment_requisitionID).set(paymentRequisitionData)
         .then(function() {
           alert("Payment requisition data saved successfully.");
@@ -328,22 +301,58 @@ firebase.initializeApp(firebaseConfig);
         });
     }
 
+    // Function to toggle visibility of columns
     function toggleColumn(columnId) {
       var column = document.getElementById(columnId);
       var isHidden = column.style.display === "none";
       column.style.display = isHidden ? "block" : "none";
     }
 
+    // Function to initialize the page
     window.onload = function() {
       var urlParams = new URLSearchParams(window.location.search);
       var tripID = urlParams.get('tripID');
-      console.log("Trip ID: ", tripID);  // Debugging
+      console.log("Trip ID: ", tripID); // Debugging
       if (tripID) {
         populateTripData(tripID);
       }
       populateAssistDriverNameDropdown();
       generatePaymentRequisitionID();
+    };
+
+    // Function to populate assist driver names in datalist
+    function populateAssistDriverNameDropdown() {
+      var assistDriverDatalist = document.getElementById("assistDrivers");
+      var assistDriversRef = database.ref('assist_drivers');
+      assistDriversRef.once('value', function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+          var assistDriverName = childSnapshot.val().assist_driver_name;
+          console.log("Assist Driver Name: ", assistDriverName); // Debugging
+          var option = document.createElement("option");
+          option.value = assistDriverName;
+          assistDriverDatalist.appendChild(option);
+        });
+      }).catch(function(error) {
+        console.error("Error fetching assist drivers: ", error); // Debugging
+      });
     }
-  </script>t>
+
+    // Function to generate a new Payment Requisition ID
+    function generatePaymentRequisitionID() {
+      var paymentReqRef = database.ref('payment_requisitions');
+      paymentReqRef.limitToLast(1).once('value', function(snapshot) {
+        var lastPaymentRequisitionID = 0;
+        snapshot.forEach(function(childSnapshot) {
+          lastPaymentRequisitionID = parseInt(childSnapshot.key, 10);
+        });
+
+        var newPaymentRequisitionID = lastPaymentRequisitionID + 1;
+        console.log("New Payment Requisition ID: ", newPaymentRequisitionID); // Debugging
+        document.getElementById("Payment_requisitionID").value = newPaymentRequisitionID;
+      }).catch(function(error) {
+        console.error("Error generating payment requisition ID: ", error); // Debugging
+      });
+    }
+  </script>
 </body>
 </html>
