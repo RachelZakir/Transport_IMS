@@ -233,8 +233,6 @@ function populateTripData(tripID) {
       // Handle any errors that occur during data retrieval
     });
 }
-
-
 window.onload = function() {
   var urlParams = new URLSearchParams(window.location.search);
   var tripID = urlParams.get('tripID');
@@ -244,10 +242,11 @@ window.onload = function() {
   } else {
     console.log('Trip ID not found in URL.');
   }
-
+  // Ensure other initialization functions are called if needed
   populateAssistDriverNameDropdown();
   generatePaymentRequisitionID();
 };
+
 
     // Function to calculate assistant's advance payment
     function calculateAssistantAllowance() {
