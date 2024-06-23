@@ -222,6 +222,7 @@ function populateTripData(tripID) {
         document.getElementById("tariffPerQuintal").value = tripData.tariffPerQuintal || "";
         document.getElementById("expectedRevenue").value = tripData.expectedRevenue || "";
         document.getElementById("tripID").value = tripID || "";
+        document.getElementById("PRDate").value = tripData.PRDate || "";
         // Add more fields as needed
       } else {
         console.log("No trip data found for tripID: ", tripID);
@@ -243,9 +244,11 @@ window.onload = function() {
     console.log('Trip ID not found in URL.');
   }
 
+  // Additional initialization functions as needed
   populateAssistDriverNameDropdown();
   generatePaymentRequisitionID();
 };
+
     // Function to calculate assistant's advance payment
     function calculateAssistantAllowance() {
       var tripStartDate = document.getElementById("tripStartDate").value;
