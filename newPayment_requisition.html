@@ -234,6 +234,7 @@ function populateTripData(tripID) {
 }
 
 // Function to initialize the page
+// Function to initialize the page
 window.onload = function() {
   var urlParams = new URLSearchParams(window.location.search);
   var tripID = urlParams.get('tripID');
@@ -248,6 +249,7 @@ window.onload = function() {
   populateAssistDriverNameDropdown();
   generatePaymentRequisitionID();
 };
+
 
     // Function to calculate assistant's advance payment
     function calculateAssistantAllowance() {
