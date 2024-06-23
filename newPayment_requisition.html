@@ -203,29 +203,47 @@ firebase.initializeApp(firebaseConfig);
 
     // Function to populate trip data based on tripID
     function populateTripData(tripID) {
-      var tripRef = database.ref('trips/' + tripID);
+  var tripRef = database.ref('trips/' + tripID);
 
-      tripRef.once('value').then(function(snapshot) {
-        var tripData = snapshot.val();
-        console.log("Trip Data: ", tripData); // Debugging
+  tripRef.once('value')
+    .then(function(snapshot) {
+      var tripData = snapshot.val();
+      console.log("Trip Data: ", tripData); // Debugging
 
-        if (tripData) {
-          // Populate fields with trip data
-          document.getElementById("DriverName").value = tripData.driverName || "";
-          document.getElementById("PlateNumber").value = tripData.plateNumber || "";
-          document.getElementById("pickupAddress").value = tripData.pickupAddress || "";
-          document.getElementById("dropAddress").value = tripData.dropAddress || "";
-          document.getElementById("cargoType").value = tripData.cargoType || "";
-          document.getElementById("kmCovered").value = tripData.kmCovered || "";
-          document.getElementById("totalQuintal").value = tripData.totalQuintal || "";
-          document.getElementById("tariffPerQuintal").value = tripData.tariffPerQuintal || "";
-          document.getElementById("expectedRevenue").value = tripData.expectedRevenue || "";
-          document.getElementById("tripID").value = tripID || "";
-        }
-      }).catch(function(error) {
-        console.error("Error fetching trip data: ", error); // Debugging
-      });
-    }
+      if (tripData) {
+        // Populate fields with trip data
+        document.getElementById("DriverName").value = tripData.driverName || "";
+        document.getElementById("PlateNumber").value = tripData.plateNumber || "";
+        document.getElementById("pickupAddress").value = tripData.pickupAddress || "";
+        document.getElementById("dropAddress").value = tripData.dropAddress || "";
+        document.getElementById("cargoType").value = tripData.cargoType || "";
+        document.getElementById("kmCovered").value = tripData.kmCovered || "";
+        document.getElementById("totalQuintal").value = tripData.totalQuintal || "";
+        document.getElementById("tariffPerQuintal").value = tripData.tariffPerQuintal || "";
+        document.getElementById("expectedRevenue").value = tripData.expectedRevenue || "";
+        document.getElementById("tripID").value = tripID || "";
+      } else {
+        console.log("No trip data found for tripID: ", tripID);
+      }
+    })
+    .catch(function(error) {
+      console.error("Error fetching trip data: ", error);
+    });
+}
+
+window.onload = function() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var tripID = urlParams.get('tripID');
+  console.log("Trip ID: ", tripID); // Debugging
+  if (tripID) {
+    populateTripData(tripID);
+  } else {
+    console.log('Trip ID not found in URL.');
+  }
+
+  populateAssistDriverNameDropdown();
+  generatePaymentRequisitionID();
+};
 
     // Function to calculate assistant's advance payment
     function calculateAssistantAllowance() {
@@ -309,16 +327,6 @@ firebase.initializeApp(firebaseConfig);
     }
 
     // Function to initialize the page
-    window.onload = function() {
-      var urlParams = new URLSearchParams(window.location.search);
-      var tripID = urlParams.get('tripID');
-      console.log("Trip ID: ", tripID); // Debugging
-      if (tripID) {
-        populateTripData(tripID);
-      }
-      populateAssistDriverNameDropdown();
-      generatePaymentRequisitionID();
-    };
 
     // Function to populate assist driver names in datalist
     function populateAssistDriverNameDropdown() {
