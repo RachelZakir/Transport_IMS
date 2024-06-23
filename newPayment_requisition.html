@@ -221,18 +221,19 @@ function populateTripData(tripID) {
         document.getElementById("totalQuintal").value = tripData.totalQuintal || "";
         document.getElementById("tariffPerQuintal").value = tripData.tariffPerQuintal || "";
         document.getElementById("expectedRevenue").value = tripData.expectedRevenue || "";
+        document.getElementById("tripID").value = tripID || "";
         document.getElementById("PRDate").value = tripData.PRDate || ""; // Assuming PRDate is in tripData
         // Add more fields as needed
       } else {
         console.log("No trip data found for tripID: ", tripID);
-        // Optionally, you can display a message or handle this scenario as needed
       }
     })
     .catch(function(error) {
       console.error("Error fetching trip data: ", error);
-      // Handle any errors that occur during data retrieval
     });
 }
+
+// Function to initialize the page
 window.onload = function() {
   var urlParams = new URLSearchParams(window.location.search);
   var tripID = urlParams.get('tripID');
@@ -242,12 +243,10 @@ window.onload = function() {
   } else {
     console.log('Trip ID not found in URL.');
   }
-  // Ensure other initialization functions are called if needed
+
   populateAssistDriverNameDropdown();
   generatePaymentRequisitionID();
 };
-
-
     // Function to calculate assistant's advance payment
     function calculateAssistantAllowance() {
       var tripStartDate = document.getElementById("tripStartDate").value;
