@@ -108,6 +108,9 @@
         return;
       }
 
+      // Log user credentials
+      console.log("Attempting login with:", username, password);
+
       // Sign in the user
       auth.signInWithEmailAndPassword(username, password)
         .then((userCredential) => {
@@ -127,10 +130,15 @@
                   title: userData.title
                 }));
 
+                // Log user data
+                console.log("User data fetched:", userData);
+
                 // Redirect based on user's title
                 if (userData.title === "Admin") {
+                  console.log("Redirecting to Admin dashboard...");
                   window.location.href = "Admindashboard.html";
                 } else {
+                  console.log("Redirecting to user dashboard...");
                   window.location.href = "dashboard.html";
                 }
               } else {
