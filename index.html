@@ -9,9 +9,9 @@
       background-image: url('log.jpg');
       background-size: cover;
       background-repeat: no-repeat;
-      background-color: #f0f0f0;
+      background-color: #f0f0f0; 
       width: 100%;
-      height: 100vh;
+      height: 100vh; /* 100% of the viewport height */
       margin: 0;
       padding: 0;
     }
@@ -26,7 +26,7 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       color: #ffffff;
       backdrop-filter: blur(10px);
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: rgba(0, 0, 0, 0.5); /* Add a semi-transparent background */
     }
     h1, h4 {
       text-align: center;
@@ -62,14 +62,13 @@
       text-decoration: underline;
     }
   </style>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js"></script>
+  <script src="session.js"></script> 
+  <iframe src="chatbot.html" width="400" height="500" style="position: fixed; bottom: 0; right: 0; border: none;"></iframe>
 </head>
 <body>
   <div class="login-container">
     <h1>Login</h1>
-    <h4>If you are a Kerchanshe Transport staff, please use the provided credentials to login.</h4>
+    <h4>If you are a Kerchanshe Transpport staff, please use the provided credentials to login.</h4>
     <form id="loginForm">
       <label for="username" style="color: greenyellow;">Username:</label>
       <input type="text" id="username" name="username" required>
@@ -79,9 +78,12 @@
       <a href="#" class="forgot-password-button">Forgot Password?</a>
     </form>
   </div>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
   <script>
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
+    // Initialize Firebase
+   var firebaseConfig = {
       apiKey: "AIzaSyA3CfQKXfQHY--JsrXGjKCt36e8u8Tyl_o",
       authDomain: "el-roi-48b9f.firebaseapp.com",
       databaseURL: "https://el-roi-48b9f-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -91,68 +93,47 @@
       appId: "1:402630086025:web:bf4aa55859c40f6487a558"
     };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const database = firebase.database();
+ firebase.initializeApp(firebaseConfig);
+    var database = firebase.database();
 
     document.getElementById("loginForm").addEventListener("submit", function(event) {
       event.preventDefault(); // Prevent form submission
 
       // Get username and password values
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
+      var username = document.getElementById("username").value.trim();
+      var password = document.getElementById("password").value.trim();
 
       if (!username || !password) {
         alert("Please enter username and password.");
         return;
       }
 
-      // Log user credentials
-      console.log("Attempting login with:", username, password);
-
-      // Sign in the user
-      auth.signInWithEmailAndPassword(username, password)
-        .then((userCredential) => {
-          // User signed in successfully
-          const user = userCredential.user;
-          console.log("Login successful:", user);
-
-          // Fetch user details from the database
-          database.ref('users/' + user.uid).once('value')
-            .then((snapshot) => {
-              const userData = snapshot.val();
-              if (userData) {
+      // Query Firebase to check if the user exists
+      database.ref('users').orderByChild('userName').equalTo(username).once('value')
+        .then(function(snapshot) {
+          if (snapshot.exists()) {
+            snapshot.forEach(function(userSnapshot) {
+              var user = userSnapshot.val();
+              if (user.password === password) {
                 // Store user info in localStorage
-                localStorage.setItem('loggedInUser', JSON.stringify({
-                  fullName: userData.fullName,
-                  userName: userData.userName,
-                  title: userData.title
-                }));
-
-                // Log user data
-                console.log("User data fetched:", userData);
-
+                localStorage.setItem('loggedInUser', JSON.stringify({ fullName: user.fullName, userName: user.userName, title: user.title }));
+                
                 // Redirect based on user's title
-                if (userData.title === "Admin") {
-                  console.log("Redirecting to Admin dashboard...");
+                if (user.title === "Admin") {
                   window.location.href = "Admindashboard.html";
                 } else {
-                  console.log("Redirecting to user dashboard...");
                   window.location.href = "dashboard.html";
                 }
               } else {
-                alert("No user data found.");
+                alert("Invalid username or password.");
               }
-            })
-            .catch((error) => {
-              console.error("Error fetching user data:", error);
-              alert("Error fetching user data: " + error.message);
             });
+          } else {
+            alert("Invalid username or password.");
+          }
         })
-        .catch((error) => {
-          console.error("Login failed:", error);
-          alert("Login failed: " + error.message);
+        .catch(function(error) {
+          alert("Error logging in: " + error.message);
         });
     });
   </script>
